@@ -5,9 +5,12 @@ using UnityEngine.UI;
 using static EmotionSystem;
 
 [RequireComponent(typeof(ConversationManager))]
+[RequireComponent(typeof(EmotionCounterDisplayer))]
+
 public class ButtonShuffleSystem : MonoBehaviour
 {
     private ConversationManager conversationManager;
+    private EmotionCounterDisplayer emotionCounterDisplayer;
     public Button button1;
     public Button button2;
     public Button button3;
@@ -15,6 +18,7 @@ public class ButtonShuffleSystem : MonoBehaviour
     private void Start()
     {
         conversationManager = GetComponent<ConversationManager>();
+        emotionCounterDisplayer = GetComponent<EmotionCounterDisplayer>();
 
         // Assign the initial random emotions to buttons
         AssignRandomEmotions();
@@ -26,6 +30,7 @@ public class ButtonShuffleSystem : MonoBehaviour
         ShuffleEmotionList(conversationManager.shuffledEmotionTypesList);
 
         SelectDesiredEmotion();
+        emotionCounterDisplayer.IncrementTurnCounter();
 
         SetButtonProperties(button1, conversationManager.GetEmotionData(conversationManager.shuffledEmotionTypesList[0]));
         SetButtonProperties(button2, conversationManager.GetEmotionData(conversationManager.shuffledEmotionTypesList[1]));
@@ -40,11 +45,9 @@ public class ButtonShuffleSystem : MonoBehaviour
 
     private void SetButtonProperties(Button button, EmotionData emotionData)
     {
-        Debug.Log("SetButtonProperties called");
-
         if (button != null)
         {
-            SetButtonText(button, emotionData.Emotion.ToString());
+            SetButtonText(button, emotionData.Type.ToString());
             SetButtonColor(button, emotionData.HexColor);
 
 
@@ -93,8 +96,6 @@ public class ButtonShuffleSystem : MonoBehaviour
 
     private void HandleButtonClick(EmotionData responseEmotionData)
     {
-        Debug.Log("button clicked form emotion "+responseEmotionData.Emotion);
-        // Call the external function in the EmotionSystem class
         conversationManager.HandlePlayerResponse(responseEmotionData);
     }
 
