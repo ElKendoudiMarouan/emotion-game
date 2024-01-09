@@ -3,28 +3,26 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-using static TMPro.Examples.ObjectSpin;
 
 [RequireComponent(typeof(ConversationManager))]
-public class EmotionCounterDisplayer : MonoBehaviour
+public class StatsCounterDisplayer : MonoBehaviour
 {
     private ConversationManager conversationManager;
+
     [SerializeField] private TextMeshProUGUI turnCounter;
     [SerializeField] private TextMeshProUGUI closenessCounter;
     private Dictionary<EmotionType, TextMeshProUGUI> emotionCounters = new Dictionary<EmotionType, TextMeshProUGUI>();
 
-    public int turnCounterMeter = 0;
-
-
     void Start()
     {
-        conversationManager = GetComponent<ConversationManager>();
+        conversationManager = Utils.GetComponent<ConversationManager>(gameObject);
+        Debug.Log($"conversationManager{conversationManager}");
 
-        if(turnCounter ==  null)
+        if (turnCounter ==  null)
         {
             turnCounter = GetCounterByName("TurnCounter");
         }
-        AdvanceTurn();
+        UpdateTurnCounter(conversationManager.turnCounterMeter);
 
         if (closenessCounter == null)
         {
@@ -39,15 +37,9 @@ public class EmotionCounterDisplayer : MonoBehaviour
         }
     }
 
-    public void AdvanceTurn()
+    public void UpdateTurnCounter(int newVal)
     {
-        turnCounterMeter++;
-        IncrementTurnCounter();
-    }
-
-    public void IncrementTurnCounter()
-    {
-        turnCounter.text = $"Turn : {conversationManager.turnCounterMeter}";
+        turnCounter.text = $"Turn : {newVal}";
     }
 
     public void UpdateClosenessCounter(int newVal)
@@ -101,5 +93,4 @@ public class EmotionCounterDisplayer : MonoBehaviour
     {
         emotionCounters.Add(emotionType, emotionCounter);
     }
-
 }

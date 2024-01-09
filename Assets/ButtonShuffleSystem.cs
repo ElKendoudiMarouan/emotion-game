@@ -5,20 +5,17 @@ using UnityEngine.UI;
 using static EmotionSystem;
 
 [RequireComponent(typeof(ConversationManager))]
-[RequireComponent(typeof(EmotionCounterDisplayer))]
 
 public class ButtonShuffleSystem : MonoBehaviour
 {
     private ConversationManager conversationManager;
-    private EmotionCounterDisplayer emotionCounterDisplayer;
     public Button button1;
     public Button button2;
     public Button button3;
 
     private void Start()
     {
-        conversationManager = GetComponent<ConversationManager>();
-        emotionCounterDisplayer = GetComponent<EmotionCounterDisplayer>();
+        conversationManager = Utils.GetComponent<ConversationManager>(gameObject);
 
         // Assign the initial random emotions to buttons
         AssignRandomEmotions();
@@ -28,9 +25,7 @@ public class ButtonShuffleSystem : MonoBehaviour
     {
         // Shuffle the array to get random emotions
         ShuffleEmotionList(conversationManager.shuffledEmotionTypesList);
-
         SelectDesiredEmotion();
-        emotionCounterDisplayer.IncrementTurnCounter();
 
         SetButtonProperties(button1, conversationManager.GetEmotionData(conversationManager.shuffledEmotionTypesList[0]));
         SetButtonProperties(button2, conversationManager.GetEmotionData(conversationManager.shuffledEmotionTypesList[1]));

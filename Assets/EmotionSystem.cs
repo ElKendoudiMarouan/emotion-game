@@ -5,18 +5,15 @@ using UnityEngine;
 using static EmotionSystem;
 
 [RequireComponent(typeof(ConversationManager))]
-[RequireComponent(typeof(EmotionCounterDisplayer))]
 public class EmotionSystem : MonoBehaviour
 {
     private ConversationManager conversationManager;
-    private EmotionCounterDisplayer emotionCounterDisplayer;
     private const int primaryEmotionalGain = 3;
     private const int secondaryEmotionalGain = 1;
 
     public void Start()
     {
-        conversationManager = GetComponent<ConversationManager>();
-        emotionCounterDisplayer = GetComponent<EmotionCounterDisplayer>();
+        conversationManager = Utils.GetComponent<ConversationManager>(gameObject);
     }
     public void HandlePlayerResponse(EmotionData responseEmotionData)
     {
@@ -51,7 +48,6 @@ public class EmotionSystem : MonoBehaviour
         sameGroupDataToDesiredEmotion.Intensity = ChangeEmotionIntensity(sameGroupDataToDesiredEmotion, +secondaryEmotionalGain);
 
         conversationManager.playerCloseness = ChangeCloseness(conversationManager.playerCloseness, +primaryEmotionalGain);
-
     }
 
     private void OpposingEmotionResponse(EmotionData desiredEmotionData)
@@ -89,14 +85,14 @@ public class EmotionSystem : MonoBehaviour
     private int ChangeEmotionIntensity(EmotionData emotionData, int variation)
     {
         var newVal = ChangeValue(emotionData.Intensity, variation);
-        emotionCounterDisplayer.AddOrUpdateEmotionCounter(emotionData.Type, newVal);
+        conversationManager.statsCounterDisplayer.AddOrUpdateEmotionCounter(emotionData.Type, newVal);
         return newVal;
     }
 
     private int ChangeCloseness(int value, int variation)
     {
         var newVal = ChangeValue(value, variation);
-        emotionCounterDisplayer.UpdateClosenessCounter(newVal);
+        conversationManager.statsCounterDisplayer.UpdateClosenessCounter(newVal);
         return newVal;
 
     }
