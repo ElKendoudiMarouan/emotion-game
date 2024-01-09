@@ -94,7 +94,6 @@ public class EmotionSystem : MonoBehaviour
         var newVal = ChangeValue(value, variation);
         conversationManager.statsCounterDisplayer.UpdateClosenessCounter(newVal);
         return newVal;
-
     }
 
     private int ChangeValue(int value, int variation)

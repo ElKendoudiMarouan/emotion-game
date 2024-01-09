@@ -3,6 +3,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using static EmotionSystem;
+using static TMPro.Examples.ObjectSpin;
 
 [RequireComponent(typeof(ConversationManager))]
 
@@ -44,16 +45,15 @@ public class ButtonShuffleSystem : MonoBehaviour
         {
             SetButtonText(button, emotionData.Type.ToString());
             SetButtonColor(button, emotionData.HexColor);
-
+            conversationManager.emotionSpriteDisplayer.FindAndUpdateButtonEmotionIcon(button.transform, emotionData.Type);
 
             button.onClick.RemoveAllListeners();
             button.onClick.AddListener(() => HandleButtonClick(emotionData));
         }
     }
-
     void SetButtonText(Button button, string text)
     {
-        Transform textTransform = button.transform.Find("Text (TMP)"); //to change name
+        Transform textTransform = button.transform.Find("Text"); //to change name
         if (textTransform != null)
         {
             TextMeshProUGUI textComponent = textTransform.GetComponent<TextMeshProUGUI>();
@@ -73,7 +73,6 @@ public class ButtonShuffleSystem : MonoBehaviour
             Debug.LogError("Text child not found on the button .");
         }
     }
-
     void SetButtonColor(Button button, string hexColor)
     {
         if (ColorUtility.TryParseHtmlString(hexColor, out Color color))
@@ -87,8 +86,6 @@ public class ButtonShuffleSystem : MonoBehaviour
             Debug.LogError("Invalid color format: " + hexColor);
         }
     }
-
-
     private void HandleButtonClick(EmotionData responseEmotionData)
     {
         conversationManager.HandlePlayerResponse(responseEmotionData);

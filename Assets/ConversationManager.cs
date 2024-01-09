@@ -43,7 +43,7 @@ public class ConversationManager : MonoBehaviour
     {
         turnCounterMeter++;
         statsCounterDisplayer.UpdateTurnCounter(turnCounterMeter);
-        emotionSpriteDisplayer.UpdateIconsBasedOnEmotion(desiredEmotion);
+        emotionSpriteDisplayer.UpdateDesiredEmotionIcon(desiredEmotion);
     }
     public void HandlePlayerResponse(EmotionData responseEmotionData)
     {
