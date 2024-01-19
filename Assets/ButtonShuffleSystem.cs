@@ -43,12 +43,13 @@ public class ButtonShuffleSystem : MonoBehaviour
     {
         if (button != null)
         {
-            SetButtonText(button, emotionData.Type.ToString());
+            DialogueLineData dialogue = conversationManager.dialogueManager.GetRandomDialogueForEotion(emotionData.Type);
+            SetButtonText(button, dialogue.playerLine);
             SetButtonColor(button, emotionData.HexColor);
             conversationManager.emotionSpriteDisplayer.FindAndUpdateButtonEmotionIcon(button.transform, emotionData.Type);
 
             button.onClick.RemoveAllListeners();
-            button.onClick.AddListener(() => HandleButtonClick(emotionData));
+            button.onClick.AddListener(() => HandleButtonClick(emotionData, dialogue));
         }
     }
     void SetButtonText(Button button, string text)
@@ -86,9 +87,9 @@ public class ButtonShuffleSystem : MonoBehaviour
             Debug.LogError("Invalid color format: " + hexColor);
         }
     }
-    private void HandleButtonClick(EmotionData responseEmotionData)
+    private void HandleButtonClick(EmotionData responseEmotionData, DialogueLineData dialogue)
     {
-        conversationManager.HandlePlayerResponse(responseEmotionData);
+        conversationManager.HandlePlayerResponse(responseEmotionData, dialogue);
     }
 
     // Helper method to shuffle an array

@@ -11,6 +11,7 @@ public class StatsCounterDisplayer : MonoBehaviour
 
     [SerializeField] private TextMeshProUGUI turnCounter;
     [SerializeField] private TextMeshProUGUI closenessCounter;
+    [SerializeField] private TextMeshProUGUI responseBox;
     private Dictionary<EmotionType, TextMeshProUGUI> emotionCounters = new Dictionary<EmotionType, TextMeshProUGUI>();
 
     void Start()
@@ -20,16 +21,21 @@ public class StatsCounterDisplayer : MonoBehaviour
 
         if (turnCounter ==  null)
         {
-            turnCounter = GetCounterByName("TurnCounter");
+            turnCounter = GetTextFieldByName("TurnCounter");
         }
         UpdateTurnCounter(conversationManager.turnCounterMeter);
 
         if (closenessCounter == null)
         {
-            closenessCounter = GetCounterByName("ClosenessCounter");
+            closenessCounter = GetTextFieldByName("ClosenessCounter");
         }
         UpdateClosenessCounter(conversationManager.playerCloseness);
 
+        if (responseBox == null)
+        {
+            responseBox = GetTextFieldByName("ResponseBox");
+        }
+        UpdateResponseBox("Well Hello There!"); //todo make dynamic
 
         foreach (EmotionData emotionData in conversationManager.emotionDataList)
         {
@@ -46,8 +52,12 @@ public class StatsCounterDisplayer : MonoBehaviour
     {
         closenessCounter.text = $"Closeness: {newVal}";
     }
+    public void UpdateResponseBox(string text)
+    {
+        responseBox.text = text;
+    }
 
-    public TextMeshProUGUI GetCounterByName(string counterName)
+    public TextMeshProUGUI GetTextFieldByName(string counterName)
     {
         GameObject counterObject = GameObject.Find(counterName);
         if (counterObject != null)
@@ -71,7 +81,7 @@ public class StatsCounterDisplayer : MonoBehaviour
         }
         else
         {
-            TextMeshProUGUI emotionCounter = GetCounterByName($"{emotionType}Counter");
+            TextMeshProUGUI emotionCounter = GetTextFieldByName($"{emotionType}Counter");
             if (emotionCounter != null)
             {
                 AddEmotionCounter(emotionType, emotionCounter);

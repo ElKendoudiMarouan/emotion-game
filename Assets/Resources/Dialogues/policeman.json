@@ -1,0 +1,119 @@
+{
+    "characterName": "Policeman Alex",
+    "dialogueLinesByEmotion" : [
+        {
+            "emotion": "Happiness",
+            "dialogueLines": [
+                { 
+                "playerLine": "I told a cat a joke, and it walked away. Tough crowd.",
+                 "sameResponse": "Cats are notorious critics. I'm here for the encore! Maybe they're dog fans.",
+                 "oppositeResponse": "Cats, the harshest judges of humor. Let me try a feline-friendly joke! Or not...",
+                 "sameGroupResponse": "Cat comedy club? Count me in! Let's entertain the whiskered audience! I'll bring the catnip!",
+                 "neutralResponse": "Cat standoff? Challenge accepted! I'll outwit the whiskers! Or maybe they'll outwit me."
+                },
+                {
+                 "playerLine": "Just saw a unicorn poop rainbows. My faith in magic is restored.",
+                 "sameResponse": "Rainbow droppings? Sounds like someone's been eating psychedelic cupcakes. I'll bring the sprinkles for your next magical encounter.",
+                 "oppositeResponse": "Unicorn waste? More like a sparkly case of indigestion. Maybe stick to unicorns on postcards.",
+                 "sameGroupResponse": "Rainbow Revolution! Time to paint the town with glitter and good vibes. I'll bring the unicorn horn costume.",
+                 "neutralResponse": "Fantastical feces? We can spin it into a scientific study! Is unicorn poop biodegradable?"
+                }
+            ]
+        },
+        {
+            "emotion": "Sadness",
+            "dialogueLines": [
+                { 
+                "playerLine": "My sandwich betrayed me. The lettuce escaped. My lunch is on the run.",
+                 "sameResponse": "The great sandwich escape! Next time, we'll have a lunchtime lockdown. No veggie escapes!",
+                 "oppositeResponse": "Lettuce mutiny? We'll catch those greens! No veggie escapes on my watch! Tomato may be the mastermind.",
+                 "sameGroupResponse": "Sandwich rebellion! Let's form an anti-escape task force! The mayo brigade will join!",
+                 "neutralResponse": "Lettuce on the loose? We'll turn it into a culinary caper! The bread may be hiding."
+                },
+                  {
+                 "playerLine": "Lost my lucky penny. Feeling cursed. Someone send positive vibes!",
+                 "sameResponse": "Penny panic? Don't worry, Officer Luck is on the case! We'll comb the streets until your fortune shines again.",
+                 "oppositeResponse": "Lost a piece of copper? Sounds like time for a fresh start. Maybe your luck needed a reboot.",
+                 "sameGroupResponse": "The Broken-Coin Brigade! We'll mourn lost trinkets and celebrate new beginnings. I'll bring the tissues and the optimism.",
+                 "neutralResponse": "Shiny sadness? We can turn it into a treasure hunt! Maybe your penny's hiding in a surprising place."
+                }
+            ]
+        },
+        {
+            "emotion": "Admiration",
+            "dialogueLines": [
+                { 
+                "playerLine": "I tried to be a superhero but got tangled in my cape. Heroic fail!",
+                 "sameResponse": "Caped crusader in a twist! I'll bring the untangling tools for your next mission. Safety first!",
+                 "oppositeResponse": "Cape conundrum? Fear not, I'm here to unravel the heroic mysteries! Let's turn it into a fashion statement.",
+                 "sameGroupResponse": "Caped confusion comrades! Let's form the Unraveling League! Capes untangled, justice served!",
+                 "neutralResponse": "Cape chaos? We'll turn it into a super-powered knot-tying challenge! Maybe capes are overrated."
+                },
+                {
+                 "playerLine": "Witnessed a grandma bench-press a car. My faith in humanity is soaring.",
+                 "sameResponse": "Granny-zilla strikes again! Let's celebrate the iron fists of our elders. I'll bring the protein shakes and the admiration award.",
+                 "oppositeResponse": "Geriatric garage gym antics? Sounds like someone needs a nap, not a weight rack. Maybe offer her a cup of tea instead.",
+                 "sameGroupResponse": "The Silver Swole Squad! We'll defy ageism with muscle and might. I'll bring the bingo balls and the barbells.",
+                 "neutralResponse": "Granny gone Goliath? We can spin it into a scientific study! Does aging unlock hidden physical potential?"
+               }
+            ]
+        },
+        {
+            "emotion": "Disgust",
+            "dialogueLines": [
+                { 
+                "playerLine": "My coffee tasted like sadness. Is there a support group for bitter brews?",
+                 "sameResponse": "Bitter coffee blues? We'll start a support group. I'll bring the sympathy donuts. Coffee connoisseurs unite!",
+                 "oppositeResponse": "Coffee calamity! Let's turn that bitterness into a blend of laughter! Maybe a hint of cinnamon will help.",
+                 "sameGroupResponse": "Bitter brew buddies unite! We'll conquer coffee disappointments together! Extra foam, no bitterness.",
+                 "neutralResponse": "Sad coffee saga? We'll transform it into a taste-testing adventure! Maybe we'll discover a new blend."
+                },
+                {
+                 "playerLine": "My neighbor's lawn gnome collection stares at me every morning. The creep factor is real.",
+                 "sameResponse": "Gnome-vasion time! I'll bring the spray paint and the gag reflex. Let's turn those grinning grins into frowns.",
+                 "oppositeResponse": "Creepy ceramic crew? Sounds like you need a lawn flamingo invasion. They'll peck those gnomes into submission.",
+                 "sameGroupResponse": "The Anti-Gnome League! We'll fight the tyranny of garden trinkets! I'll bring the pitchforks and the sense of humor.",
+                 "neutralResponse": "Gnomey gazes? We can spin it into a tourist attraction! 'The Staring Gnomes of Elm Street.' It'll pay for new hedges."
+               }
+            ]
+        },
+        {
+            "emotion": "Anger",
+            "dialogueLines": [
+                { 
+                "playerLine": "I challenged a pigeon to a staring contest. It won. I'm fuming!",
+                 "sameResponse": "Pigeon stare-down? Round two is ours! Angry eyes engaged! Maybe recruit a hawk next time.",
+                 "oppositeResponse": "Pigeon triumph? We'll turn that defeat into a fierce feathered rivalry! Angry pigeons beware!",
+                 "sameGroupResponse": "Pigeon staring society! Let's reclaim victory in the next contest! Bring your game face, and maybe sunglasses.",
+                 "neutralResponse": "Pigeon stare-off? We'll spin it into a high-stakes bird-watching tournament! Angry bird edition."
+                },
+                {
+                 "playerLine": "Lost a staring contest to a squirrel. My dominance over rodents is shaken.",
+                 "sameResponse": "Squirrel stare-down shame? Don't worry, Officer Fury is here! We'll challenge those bushy-tailed bandits to a rematch.",
+                 "oppositeResponse": "Nut rage? Sounds like you need a nap, not a nut-fight. Maybe offer them a sunflower seed peace offering.",
+                 "sameGroupResponse": "The Anti-Squirrel Alliance! We'll reclaim our territorial rights! I'll bring the bird feeders and the competitive spirit.",
+                 "neutralResponse": "Rodent rivalry? We can spin it into a park observation project! Maybe squirrels have hidden communication strategies."
+               }
+            ]
+        },
+        {
+            "emotion": "Fear",
+            "dialogueLines": [
+                { 
+                "playerLine": "A rubber duck scared me in the bathtub. Time for a bath-time showdown!",
+                 "sameResponse": "Rubber duck ambush? I'll bring reinforcements for the next bath mission. Rubber duck resistance!",
+                 "oppositeResponse": "Duck-induced fear? We'll transform bathtime into a quack-tastic adventure! Maybe recruit a toy crocodile.",
+                 "sameGroupResponse": "Rubber duck resistance! Let's conquer bath fears together! Duck dodging lessons start now.",
+                 "neutralResponse": "Duck fright in the tub? We'll turn it into a splashy suspense story! Or maybe switch to showers."
+                },
+                {
+                  "playerLine": "Heard a creepy creaking in my attic. Should I call an exorcist or a pest control guy?",
+                  "sameResponse": "Attic antics? Don't worry, Officer Ghostbuster is on the case! We'll investigate with flashlights and skepticism (and maybe a little garlic, just in case).",
+                  "oppositeResponse": "Spooky sounds? Sounds like you need a good night's sleep, not a haunted house tour. Maybe some earplugs and a lullaby will chase away the chills.",
+                  "sameGroupResponse": "The Paranormal Patrol! We'll face our attic anxieties together! I'll bring the EMF reader and the courage (and maybe a teddy bear for backup).",
+                  "neutralResponse": "Creepy creaks? We can spin it into a mystery podcast! 'The Whispers of Elm Street Attic.' It'll pay for attic insulation (and therapy sessions, if things get too spooky)."
+                }
+            ]
+        }
+    ]
+}

@@ -15,28 +15,28 @@ public class EmotionSystem : MonoBehaviour
     {
         conversationManager = Utils.GetComponent<ConversationManager>(gameObject);
     }
-    public void HandlePlayerResponse(EmotionData responseEmotionData)
+    public void HandlePlayerResponse(EmotionData responseEmotionData, DialogueLineData dialogue)
     {
         var desiredEmotionData = conversationManager.GetEmotionData(conversationManager.desiredEmotion);
         if (responseEmotionData.Type == conversationManager.desiredEmotion)
         {
-            SameEmotionResponse(desiredEmotionData);
+            SameEmotionResponse(desiredEmotionData, dialogue);
         }
         else if (responseEmotionData.Type == desiredEmotionData.OppositeType)
         {
-            OpposingEmotionResponse(desiredEmotionData);
+            OpposingEmotionResponse(desiredEmotionData, dialogue);
         }
         else if (responseEmotionData.Type == desiredEmotionData.SameGroupType)
         {
-            SameGroupEmotionResponse(desiredEmotionData);
+            SameGroupEmotionResponse(desiredEmotionData, dialogue);
         } else
         {
-            NeutralEmotionResponse(responseEmotionData);
+            NeutralEmotionResponse(responseEmotionData, dialogue);
         }
     }
 
     // Helper functions for different player responses
-    private void SameEmotionResponse(EmotionData desiredEmotionData)
+    private void SameEmotionResponse(EmotionData desiredEmotionData, DialogueLineData dialogue)
     {
         Debug.Log($"Selected the desired Emotion {desiredEmotionData.Type}");
         desiredEmotionData.Intensity = ChangeEmotionIntensity(desiredEmotionData, +primaryEmotionalGain);
@@ -48,9 +48,10 @@ public class EmotionSystem : MonoBehaviour
         sameGroupDataToDesiredEmotion.Intensity = ChangeEmotionIntensity(sameGroupDataToDesiredEmotion, +secondaryEmotionalGain);
 
         conversationManager.playerCloseness = ChangeCloseness(conversationManager.playerCloseness, +primaryEmotionalGain);
+        conversationManager.statsCounterDisplayer.UpdateResponseBox(dialogue.sameResponse);
     }
 
-    private void OpposingEmotionResponse(EmotionData desiredEmotionData)
+    private void OpposingEmotionResponse(EmotionData desiredEmotionData, DialogueLineData dialogue)
     {
         Debug.Log($"Selected opposite to desired Emotion {desiredEmotionData.Type}");
         desiredEmotionData.Intensity = ChangeEmotionIntensity(desiredEmotionData, -primaryEmotionalGain);
@@ -62,9 +63,11 @@ public class EmotionSystem : MonoBehaviour
         sameGroupToOppositeDataToDesiredEmotion.Intensity = ChangeEmotionIntensity(sameGroupToOppositeDataToDesiredEmotion, +secondaryEmotionalGain);
 
         conversationManager.playerCloseness = ChangeCloseness(conversationManager.playerCloseness, -primaryEmotionalGain);
+        conversationManager.statsCounterDisplayer.UpdateResponseBox(dialogue.oppositeResponse);
+
     }
 
-    private void SameGroupEmotionResponse(EmotionData desiredEmotionData)
+    private void SameGroupEmotionResponse(EmotionData desiredEmotionData, DialogueLineData dialogue)
     {
         Debug.Log($"Selected same group to desired Emotion {desiredEmotionData.Type}");
         desiredEmotionData.Intensity = ChangeEmotionIntensity(desiredEmotionData, +secondaryEmotionalGain);
@@ -73,12 +76,15 @@ public class EmotionSystem : MonoBehaviour
         sameGroupDataToDesiredEmotion.Intensity = ChangeEmotionIntensity(sameGroupDataToDesiredEmotion, +secondaryEmotionalGain);
 
         conversationManager.playerCloseness = ChangeCloseness(conversationManager.playerCloseness, +secondaryEmotionalGain);
+        conversationManager.statsCounterDisplayer.UpdateResponseBox(dialogue.sameGroupResponse);
+
     }
 
-    private void NeutralEmotionResponse(EmotionData responseEmotionData)
+    private void NeutralEmotionResponse(EmotionData responseEmotionData, DialogueLineData dialogue)
     {
         Debug.Log($"Selected the neutral Emotion {responseEmotionData.Type}");
         responseEmotionData.Intensity = ChangeEmotionIntensity(responseEmotionData, +secondaryEmotionalGain);
+        conversationManager.statsCounterDisplayer.UpdateResponseBox(dialogue.neutralResponse);
         //todo draw card
     }
 

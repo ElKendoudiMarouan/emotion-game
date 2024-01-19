@@ -7,12 +7,14 @@ using UnityEngine.EventSystems;
 [RequireComponent(typeof(ButtonShuffleSystem))]
 [RequireComponent(typeof(EmotionSpriteDisplayer))]
 [RequireComponent(typeof(StatsCounterDisplayer))]
+[RequireComponent(typeof(DialogueManager))]
 public class ConversationManager : MonoBehaviour
 {
     public EmotionSystem emotionSystem;
     public ButtonShuffleSystem buttonShuffleSystem;
     public StatsCounterDisplayer statsCounterDisplayer;
     public EmotionSpriteDisplayer emotionSpriteDisplayer;
+    public DialogueManager dialogueManager;
 
     public List<EmotionData> emotionDataList = new List<EmotionData>();
     public EmotionType[] shuffledEmotionTypesList;
@@ -37,7 +39,7 @@ public class ConversationManager : MonoBehaviour
         buttonShuffleSystem = Utils.GetComponent<ButtonShuffleSystem>(gameObject);
         statsCounterDisplayer = Utils.GetComponent<StatsCounterDisplayer>(gameObject);
         emotionSpriteDisplayer = Utils.GetComponent<EmotionSpriteDisplayer>(gameObject);
-
+        dialogueManager = Utils.GetComponent<DialogueManager>(gameObject);
     }
     public void AdvanceTurn()
     {
@@ -45,9 +47,9 @@ public class ConversationManager : MonoBehaviour
         statsCounterDisplayer.UpdateTurnCounter(turnCounterMeter);
         emotionSpriteDisplayer.UpdateDesiredEmotionIcon(desiredEmotion);
     }
-    public void HandlePlayerResponse(EmotionData responseEmotionData)
+    public void HandlePlayerResponse(EmotionData responseEmotionData, DialogueLineData dialogue)
     {
-        emotionSystem.HandlePlayerResponse(responseEmotionData);
+        emotionSystem.HandlePlayerResponse(responseEmotionData, dialogue);
         buttonShuffleSystem.AssignRandomEmotions();
         AdvanceTurn();
         EventSystem.current.SetSelectedGameObject(null);
