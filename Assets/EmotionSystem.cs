@@ -7,18 +7,22 @@ using static EmotionSystem;
 [RequireComponent(typeof(ConversationManager))]
 public class EmotionSystem : MonoBehaviour
 {
-    private ConversationManager conversationManager;
+    private ConversationManager cm;
     private const int primaryEmotionalGain = 3;
     private const int secondaryEmotionalGain = 1;
+    private const int comboGain = 1;
+    private const int comboThreshold = 3;
 
     public void Start()
     {
-        conversationManager = Utils.GetComponent<ConversationManager>(gameObject);
+        cm = Utils.GetComponent<ConversationManager>(gameObject);
     }
     public void HandlePlayerResponse(EmotionData responseEmotionData, DialogueLineData dialogue)
     {
-        var desiredEmotionData = conversationManager.GetEmotionData(conversationManager.desiredEmotion);
-        if (responseEmotionData.Type == conversationManager.desiredEmotion)
+        updateEmotionComboAndLatestSelectedEmotion(responseEmotionData);
+
+        var desiredEmotionData = cm.GetEmotionData(cm.desiredEmotion);
+        if (responseEmotionData.Type == cm.desiredEmotion)
         {
             SameEmotionResponse(desiredEmotionData, dialogue);
         }
@@ -33,22 +37,54 @@ public class EmotionSystem : MonoBehaviour
         {
             NeutralEmotionResponse(responseEmotionData, dialogue);
         }
+
+    }
+
+    private void updateEmotionComboAndLatestSelectedEmotion(EmotionData responseEmotionData)
+    {
+        if (cm.lastSelectedEmotion != null)
+        {
+            if (cm.lastComboEmotion != null && cm.lastComboEmotion.Type == responseEmotionData.Type)
+            {
+                ChangeEmotionCombo(+comboGain);
+                changeLastComboEmotion(responseEmotionData);
+            } else if (cm.lastComboEmotion == cm.lastSelectedEmotion && cm.lastComboEmotion.SameGroupType != responseEmotionData.Type)
+            {
+                    ChangeEmotionCombo(-comboThreshold);
+                    changeLastComboEmotion(null);
+
+            } else if (cm.lastComboEmotion != cm.lastSelectedEmotion)
+            {
+                ChangeEmotionCombo(-comboThreshold); //reset combo
+                if (cm.lastSelectedEmotion == responseEmotionData)
+                {
+                    ChangeEmotionCombo(+comboGain);
+                    changeLastComboEmotion(responseEmotionData);
+                } else
+                {
+                    changeLastComboEmotion(null);
+                }
+            }              
+        }
+        cm.lastSelectedEmotion = responseEmotionData;
     }
 
     // Helper functions for different player responses
     private void SameEmotionResponse(EmotionData desiredEmotionData, DialogueLineData dialogue)
     {
         Debug.Log($"Selected the desired Emotion {desiredEmotionData.Type}");
-        desiredEmotionData.Intensity = ChangeEmotionIntensity(desiredEmotionData, +primaryEmotionalGain);
 
-        var oppositeDataToDesiredEmotion = conversationManager.GetEmotionData(desiredEmotionData.OppositeType);
+        desiredEmotionData.Intensity = ChangeEmotionIntensity(desiredEmotionData, +primaryEmotionalGain +cm.emotionCombo);
+
+        var oppositeDataToDesiredEmotion = cm.GetEmotionData(desiredEmotionData.OppositeType);
         oppositeDataToDesiredEmotion.Intensity = ChangeEmotionIntensity(oppositeDataToDesiredEmotion, -primaryEmotionalGain);
 
-        var sameGroupDataToDesiredEmotion = conversationManager.GetEmotionData(desiredEmotionData.SameGroupType);
+        var sameGroupDataToDesiredEmotion = cm.GetEmotionData(desiredEmotionData.SameGroupType);
         sameGroupDataToDesiredEmotion.Intensity = ChangeEmotionIntensity(sameGroupDataToDesiredEmotion, +secondaryEmotionalGain);
 
-        conversationManager.playerCloseness = ChangeCloseness(conversationManager.playerCloseness, +primaryEmotionalGain);
-        conversationManager.statsCounterDisplayer.UpdateResponseBox(dialogue.sameResponse);
+        ChangeCloseness(+primaryEmotionalGain);
+
+        cm.statsCounterDisplayer.UpdateResponseBox(dialogue.sameResponse);
     }
 
     private void OpposingEmotionResponse(EmotionData desiredEmotionData, DialogueLineData dialogue)
@@ -56,14 +92,14 @@ public class EmotionSystem : MonoBehaviour
         Debug.Log($"Selected opposite to desired Emotion {desiredEmotionData.Type}");
         desiredEmotionData.Intensity = ChangeEmotionIntensity(desiredEmotionData, -primaryEmotionalGain);
 
-        var oppositeDataToDesiredEmotion = conversationManager.GetEmotionData(desiredEmotionData.OppositeType);
-        oppositeDataToDesiredEmotion.Intensity = ChangeEmotionIntensity(oppositeDataToDesiredEmotion, +primaryEmotionalGain);
+        var oppositeDataToDesiredEmotion = cm.GetEmotionData(desiredEmotionData.OppositeType);
+        oppositeDataToDesiredEmotion.Intensity = ChangeEmotionIntensity(oppositeDataToDesiredEmotion, +primaryEmotionalGain + cm.emotionCombo);
 
-        var sameGroupToOppositeDataToDesiredEmotion = conversationManager.GetEmotionData(oppositeDataToDesiredEmotion.SameGroupType);
+        var sameGroupToOppositeDataToDesiredEmotion = cm.GetEmotionData(oppositeDataToDesiredEmotion.SameGroupType);
         sameGroupToOppositeDataToDesiredEmotion.Intensity = ChangeEmotionIntensity(sameGroupToOppositeDataToDesiredEmotion, +secondaryEmotionalGain);
 
-        conversationManager.playerCloseness = ChangeCloseness(conversationManager.playerCloseness, -primaryEmotionalGain);
-        conversationManager.statsCounterDisplayer.UpdateResponseBox(dialogue.oppositeResponse);
+        ChangeCloseness(-primaryEmotionalGain);
+        cm.statsCounterDisplayer.UpdateResponseBox(dialogue.oppositeResponse);
 
     }
 
@@ -72,11 +108,11 @@ public class EmotionSystem : MonoBehaviour
         Debug.Log($"Selected same group to desired Emotion {desiredEmotionData.Type}");
         desiredEmotionData.Intensity = ChangeEmotionIntensity(desiredEmotionData, +secondaryEmotionalGain);
 
-        var sameGroupDataToDesiredEmotion = conversationManager.GetEmotionData(desiredEmotionData.SameGroupType);
-        sameGroupDataToDesiredEmotion.Intensity = ChangeEmotionIntensity(sameGroupDataToDesiredEmotion, +secondaryEmotionalGain);
+        var sameGroupDataToDesiredEmotion = cm.GetEmotionData(desiredEmotionData.SameGroupType);
+        sameGroupDataToDesiredEmotion.Intensity = ChangeEmotionIntensity(sameGroupDataToDesiredEmotion, +secondaryEmotionalGain + cm.emotionCombo);
 
-        conversationManager.playerCloseness = ChangeCloseness(conversationManager.playerCloseness, +secondaryEmotionalGain);
-        conversationManager.statsCounterDisplayer.UpdateResponseBox(dialogue.sameGroupResponse);
+        ChangeCloseness(+secondaryEmotionalGain);
+        cm.statsCounterDisplayer.UpdateResponseBox(dialogue.sameGroupResponse);
 
     }
 
@@ -84,26 +120,37 @@ public class EmotionSystem : MonoBehaviour
     {
         Debug.Log($"Selected the neutral Emotion {responseEmotionData.Type}");
         responseEmotionData.Intensity = ChangeEmotionIntensity(responseEmotionData, +secondaryEmotionalGain);
-        conversationManager.statsCounterDisplayer.UpdateResponseBox(dialogue.neutralResponse);
+        cm.statsCounterDisplayer.UpdateResponseBox(dialogue.neutralResponse);
         //todo draw card
     }
 
     private int ChangeEmotionIntensity(EmotionData emotionData, int variation)
     {
         var newVal = ChangeValue(emotionData.Intensity, variation);
-        conversationManager.statsCounterDisplayer.AddOrUpdateEmotionCounter(emotionData.Type, newVal);
+        cm.statsCounterDisplayer.AddOrUpdateEmotionCounter(emotionData.Type, newVal);
         return newVal;
     }
 
-    private int ChangeCloseness(int value, int variation)
+    private void ChangeCloseness(int variation)
     {
-        var newVal = ChangeValue(value, variation);
-        conversationManager.statsCounterDisplayer.UpdateClosenessCounter(newVal);
-        return newVal;
+        cm.playerCloseness = ChangeValue(cm.playerCloseness, variation);
+        cm.statsCounterDisplayer.UpdateClosenessCounter(cm.playerCloseness);
     }
 
-    private int ChangeValue(int value, int variation)
+    private void changeLastComboEmotion(EmotionData emotion)
     {
-        return Mathf.Clamp(value + variation, 0, 100);
+        cm.lastComboEmotion = emotion;
+        cm.emotionSpriteDisplayer.UpdateComboEmotionIcon(emotion?.Type);
+    }
+
+    private void ChangeEmotionCombo(int variation)
+    {
+        cm.emotionCombo = ChangeValue(cm.emotionCombo, variation, comboThreshold);
+        cm.statsCounterDisplayer.UpdateEmotionComboCounter(cm.emotionCombo);
+    }
+
+    private int ChangeValue(int value, int variation, int threshold = 100)
+    {
+        return Mathf.Clamp(value + variation, 0, threshold);
     }
 }

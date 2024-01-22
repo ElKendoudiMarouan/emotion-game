@@ -22,6 +22,9 @@ public class ConversationManager : MonoBehaviour
 
     public int turnCounterMeter = 1;
     public int playerCloseness = 20;
+    public int emotionCombo = 0;
+    public EmotionData lastSelectedEmotion;
+    public EmotionData lastComboEmotion;
 
     public void Awake()
     {

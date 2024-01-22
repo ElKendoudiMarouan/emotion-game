@@ -11,6 +11,7 @@ public class StatsCounterDisplayer : MonoBehaviour
 
     [SerializeField] private TextMeshProUGUI turnCounter;
     [SerializeField] private TextMeshProUGUI closenessCounter;
+    [SerializeField] private TextMeshProUGUI comboCounter;
     [SerializeField] private TextMeshProUGUI responseBox;
     private Dictionary<EmotionType, TextMeshProUGUI> emotionCounters = new Dictionary<EmotionType, TextMeshProUGUI>();
 
@@ -31,6 +32,12 @@ public class StatsCounterDisplayer : MonoBehaviour
         }
         UpdateClosenessCounter(conversationManager.playerCloseness);
 
+        if (comboCounter == null)
+        {
+            comboCounter = GetTextFieldByName("ComboCounter");
+        }
+        UpdateEmotionComboCounter(conversationManager.emotionCombo);
+
         if (responseBox == null)
         {
             responseBox = GetTextFieldByName("ResponseBox");
@@ -47,10 +54,13 @@ public class StatsCounterDisplayer : MonoBehaviour
     {
         turnCounter.text = $"Turn : {newVal}";
     }
-
     public void UpdateClosenessCounter(int newVal)
     {
         closenessCounter.text = $"Closeness: {newVal}";
+    }
+    public void UpdateEmotionComboCounter(int newVal)
+    {
+        comboCounter.text = $"Emotion Combo : +{newVal}";
     }
     public void UpdateResponseBox(string text)
     {
