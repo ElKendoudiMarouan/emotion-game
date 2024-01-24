@@ -12,6 +12,8 @@ public class EmotionSystem : MonoBehaviour
     private const int secondaryEmotionalGain = 1;
     private const int comboGain = 1;
     private const int comboThreshold = 3;
+    private const int patienceVariation = 1;
+    private const int patienceMaxVariation = 2;
 
     public void Start()
     {
@@ -46,6 +48,10 @@ public class EmotionSystem : MonoBehaviour
         {
             if (cm.lastComboEmotion != null && cm.lastComboEmotion.Type == responseEmotionData.Type)
             {
+                if (cm.emotionCombo == 2)
+                {
+                    cm.patienceManager.UpdatePatience(patienceMaxVariation); //+2 patience when combo
+                }
                 ChangeEmotionCombo(+comboGain);
                 changeLastComboEmotion(responseEmotionData);
             } else if (cm.lastComboEmotion == cm.lastSelectedEmotion && cm.lastComboEmotion.SameGroupType != responseEmotionData.Type)
@@ -83,6 +89,7 @@ public class EmotionSystem : MonoBehaviour
         sameGroupDataToDesiredEmotion.Intensity = ChangeEmotionIntensity(sameGroupDataToDesiredEmotion, +secondaryEmotionalGain);
 
         ChangeCloseness(+primaryEmotionalGain);
+        cm.patienceManager.UpdatePatience(patienceVariation);
 
         cm.statsCounterDisplayer.UpdateResponseBox(dialogue.sameResponse);
     }
@@ -99,8 +106,9 @@ public class EmotionSystem : MonoBehaviour
         sameGroupToOppositeDataToDesiredEmotion.Intensity = ChangeEmotionIntensity(sameGroupToOppositeDataToDesiredEmotion, +secondaryEmotionalGain);
 
         ChangeCloseness(-primaryEmotionalGain);
-        cm.statsCounterDisplayer.UpdateResponseBox(dialogue.oppositeResponse);
+        cm.patienceManager.UpdatePatience(-patienceMaxVariation);
 
+        cm.statsCounterDisplayer.UpdateResponseBox(dialogue.oppositeResponse);
     }
 
     private void SameGroupEmotionResponse(EmotionData desiredEmotionData, DialogueLineData dialogue)
@@ -112,6 +120,7 @@ public class EmotionSystem : MonoBehaviour
         sameGroupDataToDesiredEmotion.Intensity = ChangeEmotionIntensity(sameGroupDataToDesiredEmotion, +secondaryEmotionalGain + cm.emotionCombo);
 
         ChangeCloseness(+secondaryEmotionalGain);
+
         cm.statsCounterDisplayer.UpdateResponseBox(dialogue.sameGroupResponse);
 
     }
@@ -120,6 +129,9 @@ public class EmotionSystem : MonoBehaviour
     {
         Debug.Log($"Selected the neutral Emotion {responseEmotionData.Type}");
         responseEmotionData.Intensity = ChangeEmotionIntensity(responseEmotionData, +secondaryEmotionalGain);
+
+        cm.patienceManager.UpdatePatience(-patienceVariation);
+
         cm.statsCounterDisplayer.UpdateResponseBox(dialogue.neutralResponse);
         //todo draw card
     }
@@ -142,7 +154,7 @@ public class EmotionSystem : MonoBehaviour
         cm.lastComboEmotion = emotion;
         cm.emotionSpriteDisplayer.UpdateComboEmotionIcon(emotion?.Type);
     }
-
+     
     private void ChangeEmotionCombo(int variation)
     {
         cm.emotionCombo = ChangeValue(cm.emotionCombo, variation, comboThreshold);

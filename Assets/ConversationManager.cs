@@ -8,6 +8,7 @@ using UnityEngine.EventSystems;
 [RequireComponent(typeof(EmotionSpriteDisplayer))]
 [RequireComponent(typeof(StatsCounterDisplayer))]
 [RequireComponent(typeof(DialogueManager))]
+[RequireComponent(typeof(PatienceManager))]
 public class ConversationManager : MonoBehaviour
 {
     public EmotionSystem emotionSystem;
@@ -15,6 +16,7 @@ public class ConversationManager : MonoBehaviour
     public StatsCounterDisplayer statsCounterDisplayer;
     public EmotionSpriteDisplayer emotionSpriteDisplayer;
     public DialogueManager dialogueManager;
+    public PatienceManager patienceManager;
 
     public List<EmotionData> emotionDataList = new List<EmotionData>();
     public EmotionType[] shuffledEmotionTypesList;
@@ -43,6 +45,7 @@ public class ConversationManager : MonoBehaviour
         statsCounterDisplayer = Utils.GetComponent<StatsCounterDisplayer>(gameObject);
         emotionSpriteDisplayer = Utils.GetComponent<EmotionSpriteDisplayer>(gameObject);
         dialogueManager = Utils.GetComponent<DialogueManager>(gameObject);
+        patienceManager = Utils.GetComponent<PatienceManager>(gameObject);
     }
     public void AdvanceTurn()
     {

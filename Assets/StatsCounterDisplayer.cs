@@ -77,7 +77,7 @@ public class StatsCounterDisplayer : MonoBehaviour
         }
         else
         {
-            Debug.LogError("Counter Text with name " + counterName + " not found!");
+            Debug.LogError($"Counter Text with name {counterName} not found!");
             return null;
         }
     }
