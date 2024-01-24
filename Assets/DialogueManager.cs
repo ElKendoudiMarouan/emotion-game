@@ -9,7 +9,7 @@ public class DialogueManager : MonoBehaviour
     public CharacterDialogueData characterDialogueData;
     void Start()
     {
-        string jsonContent = Resources.Load<TextAsset>("Dialogues/policeman").text;
+        string jsonContent = Resources.Load<TextAsset>("Dialogues/policeman").text;//TODO enhance this
         characterDialogueData = JsonConvert.DeserializeObject<CharacterDialogueData>(jsonContent);
     }
 

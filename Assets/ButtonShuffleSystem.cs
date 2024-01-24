@@ -26,17 +26,11 @@ public class ButtonShuffleSystem : MonoBehaviour
     {
         // Shuffle the array to get random emotions
         ShuffleEmotionList(conversationManager.shuffledEmotionTypesList);
-        SelectDesiredEmotion();
+        conversationManager.desiredEmotion = conversationManager.SelectRandomEmotion();
 
         SetButtonProperties(button1, conversationManager.GetEmotionData(conversationManager.shuffledEmotionTypesList[0]));
         SetButtonProperties(button2, conversationManager.GetEmotionData(conversationManager.shuffledEmotionTypesList[1]));
         SetButtonProperties(button3, conversationManager.GetEmotionData(conversationManager.shuffledEmotionTypesList[2]));
-    }
-
-    public void SelectDesiredEmotion()
-    {
-        int randomNumber = UnityEngine.Random.Range(0, 6);
-        conversationManager.desiredEmotion = conversationManager.shuffledEmotionTypesList[randomNumber];
     }
 
     private void SetButtonProperties(Button button, EmotionData emotionData)

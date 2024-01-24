@@ -5,69 +5,77 @@ using TMPro;
 using UnityEngine;
 
 [RequireComponent(typeof(ConversationManager))]
-public class StatsCounterDisplayer : MonoBehaviour
+public class TextDisplaySystem : MonoBehaviour
 {
     private ConversationManager conversationManager;
 
     [SerializeField] private TextMeshProUGUI turnCounter;
     [SerializeField] private TextMeshProUGUI closenessCounter;
     [SerializeField] private TextMeshProUGUI comboCounter;
+    [SerializeField] private TextMeshProUGUI objectiveCounter;
     [SerializeField] private TextMeshProUGUI responseBox;
     private Dictionary<EmotionType, TextMeshProUGUI> emotionCounters = new Dictionary<EmotionType, TextMeshProUGUI>();
 
     void Start()
     {
         conversationManager = Utils.GetComponent<ConversationManager>(gameObject);
-        Debug.Log($"conversationManager{conversationManager}");
 
-        if (turnCounter ==  null)
-        {
-            turnCounter = GetTextFieldByName("TurnCounter");
-        }
         UpdateTurnCounter(conversationManager.turnCounterMeter);
 
-        if (closenessCounter == null)
-        {
-            closenessCounter = GetTextFieldByName("ClosenessCounter");
-        }
-        UpdateClosenessCounter(conversationManager.playerCloseness);
+        UpdateClosenessCounter(conversationManager.currentCloseness);
 
-        if (comboCounter == null)
-        {
-            comboCounter = GetTextFieldByName("ComboCounter");
-        }
         UpdateEmotionComboCounter(conversationManager.emotionCombo);
 
-        if (responseBox == null)
-        {
-            responseBox = GetTextFieldByName("ResponseBox");
-        }
         UpdateResponseBox("Well Hello There!"); //todo make dynamic
 
         foreach (EmotionData emotionData in conversationManager.emotionDataList)
         {
-            AddOrUpdateEmotionCounter(emotionData.Type, emotionData.Intensity);
+            UpdateEmotionCounter(emotionData.Type, emotionData.Intensity);
         }
     }
 
     public void UpdateTurnCounter(int newVal)
     {
+        if (turnCounter == null)
+        {
+            turnCounter = GetTextFieldByName("TurnCounter");
+        }
         turnCounter.text = $"Turn : {newVal}";
     }
     public void UpdateClosenessCounter(int newVal)
     {
+        if (closenessCounter == null)
+        {
+            closenessCounter = GetTextFieldByName("ClosenessCounter");
+        }
         closenessCounter.text = $"Closeness: {newVal}";
     }
     public void UpdateEmotionComboCounter(int newVal)
     {
+        if (comboCounter == null)
+        {
+            comboCounter = GetTextFieldByName("ComboCounter");
+        }
         comboCounter.text = $"Emotion Combo : +{newVal}";
+    }
+    public void UpdateObjectiveCounter(string text)
+    {
+        if (objectiveCounter == null)
+        {
+            objectiveCounter = GetTextFieldByName("ObjectiveCounter");
+        }
+        objectiveCounter.text = text;
     }
     public void UpdateResponseBox(string text)
     {
+        if (responseBox == null)
+        {
+            responseBox = GetTextFieldByName("ResponseBox");
+        }
         responseBox.text = text;
     }
 
-    public TextMeshProUGUI GetTextFieldByName(string counterName)
+    public TextMeshProUGUI GetTextFieldByName(string counterName) //TODO update this to recieve the field   
     {
         GameObject counterObject = GameObject.Find(counterName);
         if (counterObject != null)
@@ -82,8 +90,7 @@ public class StatsCounterDisplayer : MonoBehaviour
         }
     }
  
-    // Method to add or update an emotion counter by name
-    public void AddOrUpdateEmotionCounter(EmotionType emotionType, int newValue)
+    public void UpdateEmotionCounter(EmotionType emotionType, int newValue)
     {
         if (emotionCounters.ContainsKey(emotionType))
         {

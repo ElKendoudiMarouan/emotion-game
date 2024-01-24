@@ -1,29 +1,46 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
 [RequireComponent(typeof(EmotionSystem))]
 [RequireComponent(typeof(ButtonShuffleSystem))]
 [RequireComponent(typeof(EmotionSpriteDisplayer))]
-[RequireComponent(typeof(StatsCounterDisplayer))]
+[RequireComponent(typeof(TextDisplaySystem))]
 [RequireComponent(typeof(DialogueManager))]
 [RequireComponent(typeof(PatienceManager))]
 public class ConversationManager : MonoBehaviour
 {
     public EmotionSystem emotionSystem;
     public ButtonShuffleSystem buttonShuffleSystem;
-    public StatsCounterDisplayer statsCounterDisplayer;
+    public TextDisplaySystem textDisplaySystem;
     public EmotionSpriteDisplayer emotionSpriteDisplayer;
     public DialogueManager dialogueManager;
     public PatienceManager patienceManager;
 
+    [Header("Win condition")]
+    public ConversationWinConditon winCondition;
+    public int requiredCloseness = 30;
+    public int requiredEmotionCombo = 5;
+    public int requiredEmotionIntensity = 20;
+    public EmotionType? requiredEmotion;
+    public EmotionData requiredEmotionData;
+    public int requiredEmotionGroupIntensity = 30;
+    public EmotionGroup? requiredEmotionGroup;
+    public List<EmotionData> requiredEmotionDataForGroup;
+    public bool playerWin = false;
+
+    [Header("Emotion")]
     public List<EmotionData> emotionDataList = new List<EmotionData>();
     public EmotionType[] shuffledEmotionTypesList;
     public EmotionType desiredEmotion;
 
+    [Header("Meters")]
     public int turnCounterMeter = 1;
-    public int playerCloseness = 20;
+    public int currentCloseness = 20;
+
+    [Header("Combo")]
     public int emotionCombo = 0;
     public EmotionData lastSelectedEmotion;
     public EmotionData lastComboEmotion;
@@ -31,37 +48,112 @@ public class ConversationManager : MonoBehaviour
     public void Awake()
     {
         shuffledEmotionTypesList = new EmotionType[] { EmotionType.Happiness, EmotionType.Sadness, EmotionType.Admiration, EmotionType.Disgust, EmotionType.Anger, EmotionType.Fear };
-        emotionDataList.Add(new EmotionData(EmotionType.Happiness, EmotionType.Admiration, EmotionType.Sadness, "#FDF022"));
-        emotionDataList.Add(new EmotionData(EmotionType.Sadness, EmotionType.Fear, EmotionType.Happiness, "#6993F5"));
-        emotionDataList.Add(new EmotionData(EmotionType.Admiration, EmotionType.Happiness, EmotionType.Disgust, "#FF88DA"));
-        emotionDataList.Add(new EmotionData(EmotionType.Disgust, EmotionType.Anger, EmotionType.Admiration, "#74D41F"));
-        emotionDataList.Add(new EmotionData(EmotionType.Anger, EmotionType.Disgust, EmotionType.Fear, "#FF2800"));
-        emotionDataList.Add(new EmotionData(EmotionType.Fear, EmotionType.Sadness, EmotionType.Anger, "#C400FF"));
+        
+        emotionDataList.Add(new EmotionData(EmotionType.Happiness, EmotionType.Admiration, EmotionType.Sadness, "#FDF022", EmotionGroup.Yellow));
+        emotionDataList.Add(new EmotionData(EmotionType.Admiration, EmotionType.Happiness, EmotionType.Disgust, "#FF88DA", EmotionGroup.Yellow));
+        emotionDataList.Add(new EmotionData(EmotionType.Sadness, EmotionType.Fear, EmotionType.Happiness, "#6993F5", EmotionGroup.Blue));
+        emotionDataList.Add(new EmotionData(EmotionType.Fear, EmotionType.Sadness, EmotionType.Anger, "#C400FF", EmotionGroup.Blue));
+        emotionDataList.Add(new EmotionData(EmotionType.Anger, EmotionType.Disgust, EmotionType.Fear, "#FF2800", EmotionGroup.Red));
+        emotionDataList.Add(new EmotionData(EmotionType.Disgust, EmotionType.Anger, EmotionType.Admiration, "#74D41F", EmotionGroup.Red));
     }
     public void Start()
     {
         emotionSystem = Utils.GetComponent<EmotionSystem>(gameObject);
         buttonShuffleSystem = Utils.GetComponent<ButtonShuffleSystem>(gameObject);
-        statsCounterDisplayer = Utils.GetComponent<StatsCounterDisplayer>(gameObject);
+        textDisplaySystem = Utils.GetComponent<TextDisplaySystem>(gameObject);
         emotionSpriteDisplayer = Utils.GetComponent<EmotionSpriteDisplayer>(gameObject);
         dialogueManager = Utils.GetComponent<DialogueManager>(gameObject);
         patienceManager = Utils.GetComponent<PatienceManager>(gameObject);
+
+        winCondition = Utils.GetRandomEnumValue<ConversationWinConditon>();
+        CheckWinCondition();
     }
-    public void AdvanceTurn()
+
+    public void CheckWinCondition()
     {
-        turnCounterMeter++;
-        statsCounterDisplayer.UpdateTurnCounter(turnCounterMeter);
-        emotionSpriteDisplayer.UpdateDesiredEmotionIcon(desiredEmotion);
+        if (patienceManager.currentPatience == 0)
+        {
+            textDisplaySystem.UpdateObjectiveCounter("YOU LOST!!");
+            return;
+        }
+        var objectiveTextDetails = "";
+        switch (winCondition)
+        {
+            case ConversationWinConditon.Emotion:
+                if (requiredEmotion == null)
+                {
+                    requiredEmotion = SelectRandomEmotion();
+                    requiredEmotionData = GetEmotionData((EmotionType) requiredEmotion);
+                }
+                objectiveTextDetails =  $"Emotion {requiredEmotion} : {requiredEmotionData.Intensity} / {requiredEmotionIntensity}";
+                if (requiredEmotionData.Intensity >= requiredEmotionIntensity)
+                {
+                    playerWin = true;
+                    Debug.Log($"Win condition Achieved: Emotion more or equal to {requiredEmotionIntensity}");
+                }
+                break;
+
+            case ConversationWinConditon.Combo:
+                objectiveTextDetails = $"Combo : {emotionCombo} / {requiredEmotionCombo}";
+                if (emotionCombo >= requiredEmotionCombo)
+                {
+                    playerWin = true;
+                    Debug.Log($"Win condition Achieved: Emotion Combo more or equal to {requiredEmotionCombo}");
+                }
+
+                break;
+
+            case ConversationWinConditon.Group:
+                if (requiredEmotionGroup == null)
+                {
+                    requiredEmotionGroup = Utils.GetRandomEnumValue<EmotionGroup>();
+                    requiredEmotionDataForGroup = GetEmotionDataByGroup((EmotionGroup)requiredEmotionGroup);
+                }
+                var groupIntensity = requiredEmotionDataForGroup.Sum(e => e.Intensity);
+                objectiveTextDetails = $" Group {requiredEmotionGroup} : {groupIntensity} / {requiredEmotionGroupIntensity}";
+                if (groupIntensity >= requiredEmotionGroupIntensity)
+                {
+                    playerWin = true;
+                    Debug.Log($"Win condition Achieved: Emotion Group more or equal to {requiredEmotionGroupIntensity}");
+                }
+                break;
+
+            case ConversationWinConditon.Closeness:
+                objectiveTextDetails = $"CLosness : {currentCloseness} / {requiredCloseness}";
+                if (currentCloseness >= requiredCloseness)
+                {
+                    playerWin = true;
+                    Debug.Log($"Win condition Achieved: Closeness more or equal to {requiredCloseness}");
+                }
+                break;
+        }
+        textDisplaySystem.UpdateObjectiveCounter($"Objective : {objectiveTextDetails}{(playerWin ? " : Success" : "")}");
     }
     public void HandlePlayerResponse(EmotionData responseEmotionData, DialogueLineData dialogue)
     {
         emotionSystem.HandlePlayerResponse(responseEmotionData, dialogue);
+        CheckWinCondition();
         buttonShuffleSystem.AssignRandomEmotions();
         AdvanceTurn();
         EventSystem.current.SetSelectedGameObject(null);
     }
+    public void AdvanceTurn()
+    {
+        turnCounterMeter++;
+        textDisplaySystem.UpdateTurnCounter(turnCounterMeter);
+        emotionSpriteDisplayer.UpdateDesiredEmotionIcon(desiredEmotion);
+    }
     public EmotionData GetEmotionData(EmotionType emotion)
     {
         return emotionDataList.Find(x => x.Type == emotion)!;
+    }
+    public List<EmotionData> GetEmotionDataByGroup(EmotionGroup group)
+    {
+        return emotionDataList.FindAll(x => x.Group == group);
+    }
+    public EmotionType SelectRandomEmotion()
+    {
+        int randomNumber = UnityEngine.Random.Range(0, 6);
+        return shuffledEmotionTypesList[randomNumber];
     }
 }

@@ -2,8 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+
+[RequireComponent(typeof(ConversationManager))]
 public class PatienceManager : MonoBehaviour
 {
+    private ConversationManager conversationManager;
+
     public GameObject patiencePrefab;
     public int maxPatience = 10;
     public int intialPatience = 5;
@@ -14,6 +18,8 @@ public class PatienceManager : MonoBehaviour
 
     void Start()
     {
+        conversationManager = Utils.GetComponent<ConversationManager>(gameObject);
+
         InstantiatePatience();
     }
 
@@ -44,7 +50,7 @@ public class PatienceManager : MonoBehaviour
         }
         if(currentPatience == 0) //TODO remove later
         {
-            Application.Quit();
+           Application.Quit();
         }
     }
 

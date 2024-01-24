@@ -2,6 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum ConversationWinConditon
+{
+    Emotion,
+    Group,
+    Combo,
+    Closeness
+}
 public enum EmotionType
 {
     Happiness,
@@ -12,21 +19,30 @@ public enum EmotionType
     Fear,
 }
 
+public enum EmotionGroup
+{
+    Yellow,
+    Red,
+    Blue
+}
+
 public class EmotionData
 {
     public EmotionType Type { get; set; }
     public EmotionType SameGroupType { get; set; }
     public EmotionType OppositeType { get; set; }
-    public int Intensity { get; set; }
     public string HexColor { get; set; }
+    public EmotionGroup Group { get; set; }
+    public int Intensity { get; set; }
 
-    public EmotionData(EmotionType emotion, EmotionType sameGroup, EmotionType opposite, string hexColor, int intensity = 0)
+    public EmotionData(EmotionType emotion, EmotionType sameGroup, EmotionType opposite, string hexColor, EmotionGroup group, int intensity = 0)
     {
         Type = emotion;
         SameGroupType = sameGroup;
         OppositeType = opposite;
-        Intensity = intensity;
         HexColor = hexColor;
+        Group = group;
+        Intensity = intensity;
     }
 }
 

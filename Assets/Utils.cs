@@ -39,4 +39,11 @@ public static class Utils
         }
         return null;
     }
+    public static T GetRandomEnumValue<T>()
+    {
+        // Get a random value from an enum
+        var values = System.Enum.GetValues(typeof(T));
+        int randomIndex = Random.Range(0, values.Length);
+        return (T)values.GetValue(randomIndex);
+    }
 }

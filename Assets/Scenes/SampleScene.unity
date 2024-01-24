@@ -214,7 +214,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 154229528}
-  - component: {fileID: 154229529}
   m_Layer: 5
   m_Name: PatienceBar
   m_TagString: Untagged
@@ -234,29 +233,13 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1493337075}
-  m_RootOrder: 5
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -683, y: -452}
-  m_SizeDelta: {x: 100, y: 100}
+  m_AnchoredPosition: {x: -663, y: -447}
+  m_SizeDelta: {x: 535.93, y: 123.48}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &154229529
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 154229527}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 50992b0f6884e0f4cbe50eb12d6538c5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  patiencePrefab: {fileID: 6650447520415717812, guid: 2b51299718239194ca402dfa3ad8deb2, type: 3}
-  maxPatience: 10
-  intialPatience: 5
-  currentPatience: 5
 --- !u!1 &177826909
 GameObject:
   m_ObjectHideFlags: 0
@@ -286,7 +269,7 @@ RectTransform:
   m_Children:
   - {fileID: 1275872875}
   m_Father: {fileID: 1493337075}
-  m_RootOrder: 3
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -424,7 +407,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -1195, y: 512}
+  m_AnchoredPosition: {x: -1218, y: 510.46}
   m_SizeDelta: {x: 316.39, y: 57.61}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &274440633
@@ -575,8 +558,9 @@ RectTransform:
   - {fileID: 274440632}
   - {fileID: 709307577}
   - {fileID: 1293366440}
+  - {fileID: 590533450}
   m_Father: {fileID: 1493337075}
-  m_RootOrder: 2
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -623,7 +607,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -435.6, y: 105.97}
+  m_AnchoredPosition: {x: -417, y: 98}
   m_SizeDelta: {x: 1009.31, y: 443.94}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &458383650
@@ -826,16 +810,16 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 590533449}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 1493337075}
-  m_RootOrder: 1
+  m_Father: {fileID: 413348560}
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 347, y: 457}
+  m_AnchoredPosition: {x: -117.00006, y: 504.00003}
   m_SizeDelta: {x: 553.74, y: 96.15}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &590533451
@@ -1379,7 +1363,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -662, y: 511.23}
+  m_AnchoredPosition: {x: -744, y: 511.23}
   m_SizeDelta: {x: 485.36, y: 56.07}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &709307578
@@ -2165,7 +2149,7 @@ RectTransform:
   - {fileID: 458383649}
   - {fileID: 532457609}
   m_Father: {fileID: 1493337075}
-  m_RootOrder: 4
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -2273,7 +2257,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 220, y: -427}
+  m_AnchoredPosition: {x: 192.68, y: -413}
   m_SizeDelta: {x: 485.36, y: 56.07}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1293366441
@@ -2749,7 +2733,6 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1438266216}
-  - {fileID: 590533450}
   - {fileID: 413348560}
   - {fileID: 177826910}
   - {fileID: 1279389809}
@@ -2759,8 +2742,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -0.00012207031, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: -0.00024414, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1493337076
 MonoBehaviour:
@@ -2818,10 +2801,17 @@ MonoBehaviour:
   emotionSpriteDisplayer: {fileID: 0}
   dialogueManager: {fileID: 0}
   patienceManager: {fileID: 0}
+  winCondition: 0
+  requiredCloseness: 30
+  requiredEmotionCombo: 5
+  requiredEmotionIntensity: 20
+  requiredEmotion: 0
+  requiredEmotionGroupIntensity: 30
+  requiredEmotionGroup: 0
   shuffledEmotionTypesList: 
   desiredEmotion: 0
   turnCounterMeter: 0
-  playerCloseness: 20
+  currentCloseness: 20
   emotionCombo: 0
 --- !u!114 &1493337079
 MonoBehaviour:
@@ -2908,7 +2898,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 50992b0f6884e0f4cbe50eb12d6538c5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  patiencePrefab: {fileID: 0}
+  patiencePrefab: {fileID: 6650447520415717812, guid: 2b51299718239194ca402dfa3ad8deb2, type: 3}
   maxPatience: 8
   intialPatience: 5
   currentPatience: 5

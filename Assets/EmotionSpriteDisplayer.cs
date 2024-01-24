@@ -20,20 +20,17 @@ public class EmotionSpriteDisplayer : MonoBehaviour
 
     public void Start()
     {
-        conversationManager = GetComponent<ConversationManager>();
+        conversationManager = Utils.GetComponent<ConversationManager>(gameObject);
 
         if (desiredEmotionSpriteRenderer == null)
         {
-            Debug.Log($"looking for desired emotion renderer in {gameObject.transform}");
             desiredEmotionSpriteRenderer = FindEmotionIconSpriteRendererByName(desiredEmotionIconName, gameObject.transform);
         }
 
         if (comboEmotionSpriteRenderer == null)
         {
-            Debug.Log($"looking for combo emotion renderer in {gameObject.transform}");
             comboEmotionSpriteRenderer = FindEmotionIconSpriteRendererByName(comboEmotionIconName, gameObject.transform);
         }
-
 
         UpdateDesiredEmotionIcon(conversationManager.desiredEmotion);
     }
