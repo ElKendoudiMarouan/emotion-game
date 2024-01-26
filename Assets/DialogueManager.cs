@@ -14,7 +14,7 @@ public class DialogueManager : MonoBehaviour
     }
 
 
-    public DialogueLineData GetRandomDialogueForEotion(EmotionType emotion)
+    public DialogueLineData GetRandomDialogueForEmotion(EmotionType emotion)
     {
         DialogueLinesByEmotionData lines = characterDialogueData.dialogueLinesByEmotion.Find(cdt => emotion == cdt.emotion);
 

@@ -46,4 +46,14 @@ public static class Utils
         int randomIndex = Random.Range(0, values.Length);
         return (T)values.GetValue(randomIndex);
     }
+
+    public static List<int> CreateIncrementingList(int startValue, int count)
+    {
+        List<int> result = new List<int>();
+        for (int i = 0; i < count; i++)
+        {
+            result.Add(startValue + i);
+        }
+        return result;
+    }
 }

@@ -26,7 +26,7 @@ public class ButtonShuffleSystem : MonoBehaviour
     {
         // Shuffle the array to get random emotions
         ShuffleEmotionList(conversationManager.shuffledEmotionTypesList);
-        conversationManager.desiredEmotion = conversationManager.SelectRandomEmotion();
+        conversationManager.UpdateDesiredEmotion(conversationManager.SelectRandomEmotion());
 
         SetButtonProperties(button1, conversationManager.GetEmotionData(conversationManager.shuffledEmotionTypesList[0]));
         SetButtonProperties(button2, conversationManager.GetEmotionData(conversationManager.shuffledEmotionTypesList[1]));
@@ -37,7 +37,7 @@ public class ButtonShuffleSystem : MonoBehaviour
     {
         if (button != null)
         {
-            DialogueLineData dialogue = conversationManager.dialogueManager.GetRandomDialogueForEotion(emotionData.Type);
+            DialogueLineData dialogue = conversationManager.dialogueManager.GetRandomDialogueForEmotion(emotionData.Type);
             SetButtonText(button, dialogue.playerLine);
             SetButtonColor(button, emotionData.HexColor);
             conversationManager.emotionSpriteDisplayer.FindAndUpdateButtonEmotionIcon(button.transform, emotionData.Type);
@@ -46,7 +46,7 @@ public class ButtonShuffleSystem : MonoBehaviour
             button.onClick.AddListener(() => HandleButtonClick(emotionData, dialogue));
         }
     }
-    void SetButtonText(Button button, string text)
+    public static void SetButtonText(Button button, string text)
     {
         Transform textTransform = button.transform.Find("Text"); //to change name
         if (textTransform != null)
@@ -68,7 +68,7 @@ public class ButtonShuffleSystem : MonoBehaviour
             Debug.LogError("Text child not found on the button .");
         }
     }
-    void SetButtonColor(Button button, string hexColor)
+    public static void SetButtonColor(Button button, string hexColor)
     {
         if (ColorUtility.TryParseHtmlString(hexColor, out Color color))
         {

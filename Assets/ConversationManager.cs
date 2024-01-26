@@ -5,19 +5,23 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 
 [RequireComponent(typeof(EmotionSystem))]
-[RequireComponent(typeof(ButtonShuffleSystem))]
 [RequireComponent(typeof(EmotionSpriteDisplayer))]
+[RequireComponent(typeof(ButtonShuffleSystem))]
 [RequireComponent(typeof(TextDisplaySystem))]
 [RequireComponent(typeof(DialogueManager))]
 [RequireComponent(typeof(PatienceManager))]
+[RequireComponent(typeof(DeckManager))]
+[RequireComponent(typeof(CardEffectManager))]
 public class ConversationManager : MonoBehaviour
 {
     public EmotionSystem emotionSystem;
+    public EmotionSpriteDisplayer emotionSpriteDisplayer;
     public ButtonShuffleSystem buttonShuffleSystem;
     public TextDisplaySystem textDisplaySystem;
-    public EmotionSpriteDisplayer emotionSpriteDisplayer;
     public DialogueManager dialogueManager;
     public PatienceManager patienceManager;
+    public DeckManager deckManager;
+    public CardEffectManager cardEffectManager;
 
     [Header("Win condition")]
     public ConversationWinConditon winCondition;
@@ -64,6 +68,8 @@ public class ConversationManager : MonoBehaviour
         emotionSpriteDisplayer = Utils.GetComponent<EmotionSpriteDisplayer>(gameObject);
         dialogueManager = Utils.GetComponent<DialogueManager>(gameObject);
         patienceManager = Utils.GetComponent<PatienceManager>(gameObject);
+        deckManager = Utils.GetComponent<DeckManager>(gameObject);
+        cardEffectManager = Utils.GetComponent<CardEffectManager>(gameObject);
 
         winCondition = Utils.GetRandomEnumValue<ConversationWinConditon>();
         CheckWinCondition();
@@ -119,7 +125,7 @@ public class ConversationManager : MonoBehaviour
                 break;
 
             case ConversationWinConditon.Closeness:
-                objectiveTextDetails = $"CLosness : {currentCloseness} / {requiredCloseness}";
+                objectiveTextDetails = $"Closness : {currentCloseness} / {requiredCloseness}";
                 if (currentCloseness >= requiredCloseness)
                 {
                     playerWin = true;
@@ -135,15 +141,20 @@ public class ConversationManager : MonoBehaviour
         CheckWinCondition();
         buttonShuffleSystem.AssignRandomEmotions();
         AdvanceTurn();
+        emotionSystem.checkCardEffectsThisTurn();
         EventSystem.current.SetSelectedGameObject(null);
     }
     public void AdvanceTurn()
     {
         turnCounterMeter++;
         textDisplaySystem.UpdateTurnCounter(turnCounterMeter);
+    }
+    public void UpdateDesiredEmotion(EmotionType desiredEmotion)
+    {
+        this.desiredEmotion = desiredEmotion;
         emotionSpriteDisplayer.UpdateDesiredEmotionIcon(desiredEmotion);
     }
-    public EmotionData GetEmotionData(EmotionType emotion)
+    public EmotionData GetEmotionData(EmotionType emotion) //todo : to extension class
     {
         return emotionDataList.Find(x => x.Type == emotion)!;
     }

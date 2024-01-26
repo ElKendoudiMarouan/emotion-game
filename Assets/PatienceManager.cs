@@ -14,7 +14,7 @@ public class PatienceManager : MonoBehaviour
     public int currentPatience = 5;
     
     private List<GameObject> iconsObjects = new List<GameObject>();
-    private float iconsSpacing = 1f; // Adjust this value based on your layout
+    private float iconsSpacing = 100f;
 
     void Start()
     {
@@ -34,7 +34,9 @@ public class PatienceManager : MonoBehaviour
             }
             Vector3 position = patienceBar.transform.position;
 
-            GameObject patience = Instantiate(patiencePrefab, new Vector3(position.x + i * iconsSpacing, position.y, position.z), Quaternion.identity, patienceBar.transform);
+            GameObject patience = Instantiate(patiencePrefab, patienceBar.transform);
+            patience.GetComponent<RectTransform>().anchoredPosition = new Vector2(position.x + i * iconsSpacing, position.y);
+
 
             iconsObjects.Add(patience);
         }

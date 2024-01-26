@@ -1,6 +1,4 @@
 using UnityEngine;
-using UnityEngine.UI;
-using UnityEngine.UIElements;
 
 [RequireComponent(typeof(ConversationManager))]
 public class EmotionSpriteDisplayer : MonoBehaviour
@@ -9,39 +7,40 @@ public class EmotionSpriteDisplayer : MonoBehaviour
     private SpriteRenderer comboEmotionSpriteRenderer;
 
     private ConversationManager conversationManager;
-    private float desiredIconSize = 1.2f;
+    private float desiredIconSize = 100f;
     private float buttonIconSize = 100f;
     [SerializeField] private string desiredEmotionIconName = "DesiredEmotionIcon";
     [SerializeField] private string comboEmotionIconName = "ComboEmotionIcon";
     [SerializeField] private string buttonEmotionIconName = "ButtonEmotionIcon";
 
     // Name of the folder inside  Resources base folder where emotion icons folder is located
-    private const string ResourcesFolder = "EmotionSprites/";
+    private const string emotionSpritesFolder = "EmotionSprites/";
 
     public void Start()
     {
         conversationManager = Utils.GetComponent<ConversationManager>(gameObject);
+
+        UpdateComboEmotionIcon(null);
+    }
+
+    public void UpdateDesiredEmotionIcon(EmotionType emotionType)
+    {
 
         if (desiredEmotionSpriteRenderer == null)
         {
             desiredEmotionSpriteRenderer = FindEmotionIconSpriteRendererByName(desiredEmotionIconName, gameObject.transform);
         }
 
-        if (comboEmotionSpriteRenderer == null)
-        {
-            comboEmotionSpriteRenderer = FindEmotionIconSpriteRendererByName(comboEmotionIconName, gameObject.transform);
-        }
-
-        UpdateDesiredEmotionIcon(conversationManager.desiredEmotion);
-    }
-
-    public void UpdateDesiredEmotionIcon(EmotionType emotionType)
-    {
         UpdateEmotionIcon(conversationManager.desiredEmotion, desiredIconSize, desiredEmotionSpriteRenderer);
     }
 
     public void UpdateComboEmotionIcon(EmotionType? emotionType)
     {
+        if (comboEmotionSpriteRenderer == null)
+        {
+            comboEmotionSpriteRenderer = FindEmotionIconSpriteRendererByName(comboEmotionIconName, gameObject.transform);
+        }
+
         UpdateEmotionIcon(emotionType, buttonIconSize, comboEmotionSpriteRenderer);
     }
 
@@ -97,6 +96,6 @@ public class EmotionSpriteDisplayer : MonoBehaviour
     private Sprite LoadSprite(string spriteName)
     {
         // Load the sprite dynamically from the Resources folder
-        return Resources.Load<Sprite>(ResourcesFolder + spriteName);
+        return Resources.Load<Sprite>(emotionSpritesFolder + spriteName);
     }
 }

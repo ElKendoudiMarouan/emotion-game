@@ -1,17 +1,21 @@
-using System;
 using System.Collections.Generic;
-using System.Xml.Linq;
 using UnityEngine;
-using static EmotionSystem;
 
 [RequireComponent(typeof(ConversationManager))]
 public class EmotionSystem : MonoBehaviour
 {
     private ConversationManager cm;
+    [Header("Emotion Gain")]
     private const int primaryEmotionalGain = 3;
     private const int secondaryEmotionalGain = 1;
+    public List<int> emotionNegationShieldTurns = new List<int> { };
+    private bool shieldEmotionFromNegationThisTurn = false;
+    [Header("Combo Gain")]
     private const int comboGain = 1;
     private const int comboThreshold = 5;
+    public List<int> comboProtectorTurns = new List<int> { };
+    private bool protectComboThisTurn = false;
+    [Header("Patience Gain")]
     private const int patienceVariation = 1;
     private const int patienceMaxVariation = 2;
 
@@ -41,6 +45,12 @@ public class EmotionSystem : MonoBehaviour
         }
     }
 
+    public void checkCardEffectsThisTurn()
+    {
+        protectComboThisTurn = comboProtectorTurns.Contains(cm.turnCounterMeter);
+        shieldEmotionFromNegationThisTurn = emotionNegationShieldTurns.Contains(cm.turnCounterMeter);
+    }
+
     /**
      *  combo =/= last && resp = combo -> +1
         combo=/= last && resp = last -> change combo
@@ -51,6 +61,8 @@ public class EmotionSystem : MonoBehaviour
      */
     private void updateEmotionComboAndLatestSelectedEmotion(EmotionData responseEmotionData)
     {
+        int comboVariation = 0;
+
         if (cm.lastSelectedEmotion != null)
         {
             if (cm.lastComboEmotion != null && cm.lastComboEmotion.Type == responseEmotionData.Type)
@@ -59,30 +71,31 @@ public class EmotionSystem : MonoBehaviour
                 {
                     cm.patienceManager.UpdatePatience(cm.emotionCombo); //+2/4 patience two times when combo (in 3 and 5)
                 }
-                ChangeEmotionCombo(+comboGain);
+                comboVariation = +comboGain;
                 changeLastComboEmotion(responseEmotionData);
-            } else if (cm.lastComboEmotion == cm.lastSelectedEmotion && cm.lastComboEmotion.SameGroupType != responseEmotionData.Type)
+            } else if (cm.lastComboEmotion == cm.lastSelectedEmotion && cm.lastComboEmotion.SameGroupType != responseEmotionData.Type && !protectComboThisTurn)
             {
-                    ChangeEmotionCombo(-comboThreshold);
+                    comboVariation = -comboThreshold;
                     changeLastComboEmotion(null);
 
-            } else if (cm.lastComboEmotion != cm.lastSelectedEmotion)
+            } else if (cm.lastComboEmotion != cm.lastSelectedEmotion && !protectComboThisTurn)
             {
-                ChangeEmotionCombo(-comboThreshold); //reset combo
-                if (cm.lastSelectedEmotion == responseEmotionData)
+                comboVariation = -comboThreshold; //reset combo
+                if (cm.lastSelectedEmotion == responseEmotionData) //case new combo emotion
                 {
-                    ChangeEmotionCombo(+comboGain);
+                    comboVariation = + comboGain;
                     changeLastComboEmotion(responseEmotionData);
                 } else
                 {
                     changeLastComboEmotion(null);
                 }
-            }              
+            }   
+            //keep combo if all conditions fail
         }
+        ChangeEmotionCombo(comboVariation);
         cm.lastSelectedEmotion = responseEmotionData;
     }
 
-    // Helper functions for different player responses
     private void SameEmotionResponse(EmotionData desiredEmotionData, DialogueLineData dialogue)
     {
         Debug.Log($"Selected the desired Emotion {desiredEmotionData.Type}");
@@ -140,12 +153,14 @@ public class EmotionSystem : MonoBehaviour
         cm.patienceManager.UpdatePatience(-patienceVariation);
 
         cm.textDisplaySystem.UpdateResponseBox(dialogue.neutralResponse);
-        //todo draw card
+        cm.deckManager.DrawCard();
     }
 
     private int ChangeEmotionIntensity(EmotionData emotionData, int variation)
     {
-        var newVal = ChangeValue(emotionData.Intensity, variation);
+        var finalVariation = shieldEmotionFromNegationThisTurn && variation < 0 ?  0 : variation;
+
+        var newVal = ChangeValue(emotionData.Intensity, finalVariation);
         cm.textDisplaySystem.UpdateEmotionCounter(emotionData.Type, newVal);
         return newVal;
     }
@@ -164,7 +179,9 @@ public class EmotionSystem : MonoBehaviour
      
     private void ChangeEmotionCombo(int variation)
     {
-        cm.emotionCombo = ChangeValue(cm.emotionCombo, variation, comboThreshold);
+        int finalVariation = protectComboThisTurn && variation < 0  ? 0: variation; //toProtectCombo
+
+        cm.emotionCombo = ChangeValue(cm.emotionCombo, finalVariation, comboThreshold);
         cm.textDisplaySystem.UpdateEmotionComboCounter(cm.emotionCombo);
     }
 

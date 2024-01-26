@@ -46,6 +46,27 @@ public class EmotionData
     }
 }
 
+public class Card
+{
+    public string Name { get; set; }
+    public CardType Type { get; set; }
+    // Add more properties as needed
+
+    public Card(string name, CardType type)
+    {
+        Name = name;
+        Type = type;
+    }
+}
+
+public enum CardType
+{
+    EmotionSwitch,
+    ComboKeeper,
+    NegationShield,
+    IncreasePatience
+}
+
 [System.Serializable]
 public class CharacterDialogueData
 {
