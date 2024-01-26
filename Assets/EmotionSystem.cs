@@ -9,19 +9,19 @@ public class EmotionSystem : MonoBehaviour
     private const int primaryEmotionalGain = 3;
     private const int secondaryEmotionalGain = 1;
     public List<int> emotionNegationShieldTurns = new List<int> { };
-    private bool shieldEmotionFromNegationThisTurn = false;
+    public bool shieldEmotionFromNegationThisTurn { get; set; } = false;
     [Header("Combo Gain")]
     private const int comboGain = 1;
     private const int comboThreshold = 5;
     public List<int> comboProtectorTurns = new List<int> { };
-    private bool protectComboThisTurn = false;
+    public bool protectComboThisTurn { get; set; } = false;
     [Header("Patience Gain")]
     private const int patienceVariation = 1;
     private const int patienceMaxVariation = 2;
 
     public void Start()
     {
-        cm = Utils.GetComponent<ConversationManager>(gameObject);
+        cm = Utils.GetComponentInObject<ConversationManager>(gameObject);
     }
     public void HandlePlayerResponse(EmotionData responseEmotionData, DialogueLineData dialogue)
     {
@@ -43,12 +43,6 @@ public class EmotionSystem : MonoBehaviour
         {
             NeutralEmotionResponse(responseEmotionData, dialogue);
         }
-    }
-
-    public void checkCardEffectsThisTurn()
-    {
-        protectComboThisTurn = comboProtectorTurns.Contains(cm.turnCounterMeter);
-        shieldEmotionFromNegationThisTurn = emotionNegationShieldTurns.Contains(cm.turnCounterMeter);
     }
 
     /**
@@ -174,7 +168,7 @@ public class EmotionSystem : MonoBehaviour
     private void changeLastComboEmotion(EmotionData emotion)
     {
         cm.lastComboEmotion = emotion;
-        cm.emotionSpriteDisplayer.UpdateComboEmotionIcon(emotion?.Type);
+        cm.spriteDisplaySystem.UpdateComboEmotionIcon(emotion?.Type);
     }
      
     private void ChangeEmotionCombo(int variation)

@@ -12,11 +12,11 @@ public enum ConversationWinConditon
 public enum EmotionType
 {
     Happiness,
-    Sadness,
     Admiration,
-    Disgust,
-    Anger,
     Fear,
+    Sadness,
+    Anger,
+    Disgust,
 }
 
 public enum EmotionGroup

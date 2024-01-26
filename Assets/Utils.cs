@@ -1,10 +1,10 @@
-using System.Collections;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 public static class Utils
 {
-    public static T GetComponent<T>(GameObject gameObject) where T : Component
+    public static T GetComponentInObject<T>(GameObject gameObject) where T : Component
     {
         T component = gameObject.GetComponent<T>();
 
@@ -20,6 +20,22 @@ public static class Utils
         System.Diagnostics.StackFrame frame = stackTrace.GetFrame(2); // Adjust the frame index as needed
         return frame.GetMethod().DeclaringType.Name;
     }
+
+    public static T RecursiveGetComponentByObjectName<T>(string componentName, Transform parentTransform) where T : Component
+    {
+        Transform transform = Utils.RecursiveFindChild(parentTransform, componentName);
+
+        if (transform != null)
+        {
+            return GetComponentInObject<T>(transform.gameObject);
+        }
+        else
+        {
+            Debug.LogError($"Target object with name '{componentName}' not found!");
+            return null;
+        }
+    }
+
     public static Transform RecursiveFindChild(Transform parent, string childName)
     {
         foreach (Transform child in parent)
@@ -39,12 +55,31 @@ public static class Utils
         }
         return null;
     }
+
+    /**
+     * List and enum utils
+     */
     public static T GetRandomEnumValue<T>()
     {
         // Get a random value from an enum
         var values = System.Enum.GetValues(typeof(T));
-        int randomIndex = Random.Range(0, values.Length);
+        int randomIndex = UnityEngine.Random.Range(0, values.Length);
         return (T)values.GetValue(randomIndex);
+    }
+
+    public static int GetPositionByEnumValue<T>(T enumValue) where T : Enum
+    {
+        T[] values = (T[])Enum.GetValues(typeof(T));
+
+        for (int i = 0; i < values.Length; i++)
+        {
+            if (EqualityComparer<T>.Default.Equals(values[i], enumValue))
+            {
+                return i;
+            }
+        }
+        Debug.LogError($"Enum value {enumValue} not found in enum {typeof(T)}");
+        return 0;
     }
 
     public static List<int> CreateIncrementingList(int startValue, int count)
@@ -55,5 +90,17 @@ public static class Utils
             result.Add(startValue + i);
         }
         return result;
+    }
+
+    public static void ShuffleList<T>(T[] array)
+    {
+        int n = array.Length;
+        for (int i = 0; i < n; i++)
+        {
+            int r = i + UnityEngine.Random.Range(0, n - i);
+            T temp = array[i];
+            array[i] = array[r];
+            array[r] = temp;
+        }
     }
 }

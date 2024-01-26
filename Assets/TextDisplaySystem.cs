@@ -18,7 +18,7 @@ public class TextDisplaySystem : MonoBehaviour
 
     void Start()
     {
-        conversationManager = Utils.GetComponent<ConversationManager>(gameObject);
+        conversationManager = Utils.GetComponentInObject<ConversationManager>(gameObject);
 
         UpdateTurnCounter(conversationManager.turnCounterMeter);
 

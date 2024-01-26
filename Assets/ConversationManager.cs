@@ -5,8 +5,8 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 
 [RequireComponent(typeof(EmotionSystem))]
-[RequireComponent(typeof(EmotionSpriteDisplayer))]
-[RequireComponent(typeof(ButtonShuffleSystem))]
+[RequireComponent(typeof(SpriteDisplaySystem))]
+[RequireComponent(typeof(ButtonCreationSystem))]
 [RequireComponent(typeof(TextDisplaySystem))]
 [RequireComponent(typeof(DialogueManager))]
 [RequireComponent(typeof(PatienceManager))]
@@ -15,8 +15,8 @@ using UnityEngine.EventSystems;
 public class ConversationManager : MonoBehaviour
 {
     public EmotionSystem emotionSystem;
-    public EmotionSpriteDisplayer emotionSpriteDisplayer;
-    public ButtonShuffleSystem buttonShuffleSystem;
+    public SpriteDisplaySystem spriteDisplaySystem;
+    public ButtonCreationSystem buttonCreationSystem;
     public TextDisplaySystem textDisplaySystem;
     public DialogueManager dialogueManager;
     public PatienceManager patienceManager;
@@ -62,17 +62,18 @@ public class ConversationManager : MonoBehaviour
     }
     public void Start()
     {
-        emotionSystem = Utils.GetComponent<EmotionSystem>(gameObject);
-        buttonShuffleSystem = Utils.GetComponent<ButtonShuffleSystem>(gameObject);
-        textDisplaySystem = Utils.GetComponent<TextDisplaySystem>(gameObject);
-        emotionSpriteDisplayer = Utils.GetComponent<EmotionSpriteDisplayer>(gameObject);
-        dialogueManager = Utils.GetComponent<DialogueManager>(gameObject);
-        patienceManager = Utils.GetComponent<PatienceManager>(gameObject);
-        deckManager = Utils.GetComponent<DeckManager>(gameObject);
-        cardEffectManager = Utils.GetComponent<CardEffectManager>(gameObject);
+        emotionSystem = Utils.GetComponentInObject<EmotionSystem>(gameObject);
+        buttonCreationSystem = Utils.GetComponentInObject<ButtonCreationSystem>(gameObject);
+        textDisplaySystem = Utils.GetComponentInObject<TextDisplaySystem>(gameObject);
+        spriteDisplaySystem = Utils.GetComponentInObject<SpriteDisplaySystem>(gameObject);
+        dialogueManager = Utils.GetComponentInObject<DialogueManager>(gameObject);
+        patienceManager = Utils.GetComponentInObject<PatienceManager>(gameObject);
+        deckManager = Utils.GetComponentInObject<DeckManager>(gameObject);
+        cardEffectManager = Utils.GetComponentInObject<CardEffectManager>(gameObject);
 
         winCondition = Utils.GetRandomEnumValue<ConversationWinConditon>();
         CheckWinCondition();
+        Utils.ShuffleList(shuffledEmotionTypesList);
     }
 
     public void CheckWinCondition()
@@ -138,11 +139,17 @@ public class ConversationManager : MonoBehaviour
     public void HandlePlayerResponse(EmotionData responseEmotionData, DialogueLineData dialogue)
     {
         emotionSystem.HandlePlayerResponse(responseEmotionData, dialogue);
+        spriteDisplaySystem.UpdateNPCPortrait(responseEmotionData.Type);
+
         CheckWinCondition();
-        buttonShuffleSystem.AssignRandomEmotions();
+
+        Utils.ShuffleList(shuffledEmotionTypesList);
+        buttonCreationSystem.AssignRandomEmotions();
+
         AdvanceTurn();
-        emotionSystem.checkCardEffectsThisTurn();
-        EventSystem.current.SetSelectedGameObject(null);
+
+        cardEffectManager.CheckCardEffectsThisTurn();
+        EventSystem.current.SetSelectedGameObject(null); //remove select from button
     }
     public void AdvanceTurn()
     {
@@ -152,7 +159,7 @@ public class ConversationManager : MonoBehaviour
     public void UpdateDesiredEmotion(EmotionType desiredEmotion)
     {
         this.desiredEmotion = desiredEmotion;
-        emotionSpriteDisplayer.UpdateDesiredEmotionIcon(desiredEmotion);
+        spriteDisplaySystem.UpdateDesiredEmotionIcon(desiredEmotion);
     }
     public EmotionData GetEmotionData(EmotionType emotion) //todo : to extension class
     {

@@ -35,7 +35,7 @@ public class DeckManager : MonoBehaviour
 
     void Start()
     {
-        cm = Utils.GetComponent<ConversationManager>(gameObject);
+        cm = Utils.GetComponentInObject<ConversationManager>(gameObject);
 
         //deckSystem = gameObject.AddComponent<DeckManager>();
         ShuffleDeck();
@@ -81,8 +81,8 @@ public class DeckManager : MonoBehaviour
        
         Button buttonComponent = cardObject.GetComponent<Button>();
 
-        ButtonShuffleSystem.SetButtonText(buttonComponent, card.Name);
-        ButtonShuffleSystem.SetButtonColor(buttonComponent, "#7695bf");
+        ButtonCreationSystem.SetButtonText(buttonComponent, card.Name);
+        ButtonCreationSystem.SetButtonColor(buttonComponent, "#7695bf");
 
         buttonComponent.onClick.AddListener(() => PlayCard(card));
     }

@@ -18,7 +18,7 @@ public class PatienceManager : MonoBehaviour
 
     void Start()
     {
-        conversationManager = Utils.GetComponent<ConversationManager>(gameObject);
+        conversationManager = Utils.GetComponentInObject<ConversationManager>(gameObject);
 
         InstantiatePatience();
     }

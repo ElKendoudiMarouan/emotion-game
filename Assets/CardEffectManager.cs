@@ -9,7 +9,7 @@ public class CardEffectManager : MonoBehaviour
 
     void Start()
     {
-        cm = Utils.GetComponent<ConversationManager>(gameObject);
+        cm = Utils.GetComponentInObject<ConversationManager>(gameObject);
     }
 
     public void ApplyCardEffect(Card card)
@@ -30,6 +30,12 @@ public class CardEffectManager : MonoBehaviour
                 break;
                 // Handle other card types
         }
+        CheckCardEffectsThisTurn();
+    }
+    public void CheckCardEffectsThisTurn()
+    {
+        cm.emotionSystem.protectComboThisTurn = cm.emotionSystem.comboProtectorTurns.Contains(cm.turnCounterMeter);
+        cm.emotionSystem.shieldEmotionFromNegationThisTurn = cm.emotionSystem.emotionNegationShieldTurns.Contains(cm.turnCounterMeter);
     }
 
     public void ApplyOppositeDesiredCardEffect()
