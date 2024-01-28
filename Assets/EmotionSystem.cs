@@ -23,25 +23,26 @@ public class EmotionSystem : MonoBehaviour
     {
         cm = Utils.GetComponentInObject<ConversationManager>(gameObject);
     }
-    public void HandlePlayerResponse(EmotionData responseEmotionData, DialogueLineData dialogue)
+
+    public void HandlePlayerResponse(EmotionDialogueChoice emotionDialogue)
     {
-        updateEmotionComboAndLatestSelectedEmotion(responseEmotionData);
+        updateEmotionComboAndLatestSelectedEmotion(emotionDialogue);
 
         var desiredEmotionData = cm.GetEmotionData(cm.desiredEmotion);
-        if (responseEmotionData.Type == cm.desiredEmotion)
+        switch (emotionDialogue.ResponseType)
         {
-            SameEmotionResponse(desiredEmotionData, dialogue);
-        }
-        else if (responseEmotionData.Type == desiredEmotionData.OppositeType)
-        {
-            OpposingEmotionResponse(desiredEmotionData, dialogue);
-        }
-        else if (responseEmotionData.Type == desiredEmotionData.SameGroupType)
-        {
-            SameGroupEmotionResponse(desiredEmotionData, dialogue);
-        } else
-        {
-            NeutralEmotionResponse(responseEmotionData, dialogue);
+            case  ResponseType.Identical:
+                IdenticalEmotionResponse(emotionDialogue, desiredEmotionData);
+                break;
+            case ResponseType.Close:
+                CloseEmotionResponse(emotionDialogue, desiredEmotionData);
+                break;
+            case ResponseType.Opposite:
+                OpposingEmotionResponse(emotionDialogue, desiredEmotionData);
+                break;
+            case ResponseType.Neutral:
+                NeutralEmotionResponse(emotionDialogue);
+                break;
         }
     }
 
@@ -53,13 +54,13 @@ public class EmotionSystem : MonoBehaviour
         combo == last && resp =/= combo ---> resp == combo.samegroup -> keep
         combo == last && resp =/= combo |--> resp =/= samegeoup -> remove combo
      */
-    private void updateEmotionComboAndLatestSelectedEmotion(EmotionData responseEmotionData)
+    private void updateEmotionComboAndLatestSelectedEmotion(EmotionDialogueChoice emotionDialogue)
     {
         int comboVariation = 0;
-
+        var responseEmotionData = emotionDialogue.EmotionData;
         if (cm.lastSelectedEmotion != null)
         {
-            if (cm.lastComboEmotion != null && cm.lastComboEmotion.Type == responseEmotionData.Type)
+            if (cm.lastComboEmotion != null && cm.lastComboEmotion.EmotionType == responseEmotionData.EmotionType)
             {
                 if (cm.emotionCombo == 2 || cm.emotionCombo == 4)
                 {
@@ -67,7 +68,7 @@ public class EmotionSystem : MonoBehaviour
                 }
                 comboVariation = +comboGain;
                 changeLastComboEmotion(responseEmotionData);
-            } else if (cm.lastComboEmotion == cm.lastSelectedEmotion && cm.lastComboEmotion.SameGroupType != responseEmotionData.Type && !protectComboThisTurn)
+            } else if (cm.lastComboEmotion == cm.lastSelectedEmotion && cm.lastComboEmotion.SameGroupType != responseEmotionData.EmotionType && !protectComboThisTurn)
             {
                     comboVariation = -comboThreshold;
                     changeLastComboEmotion(null);
@@ -90,9 +91,9 @@ public class EmotionSystem : MonoBehaviour
         cm.lastSelectedEmotion = responseEmotionData;
     }
 
-    private void SameEmotionResponse(EmotionData desiredEmotionData, DialogueLineData dialogue)
+    private void IdenticalEmotionResponse(EmotionDialogueChoice emotionDialogue, EmotionData desiredEmotionData)
     {
-        Debug.Log($"Selected the desired Emotion {desiredEmotionData.Type}");
+        Debug.Log($"Selected the desired Emotion {desiredEmotionData.EmotionType}");
 
         desiredEmotionData.Intensity = ChangeEmotionIntensity(desiredEmotionData, +primaryEmotionalGain +cm.emotionCombo);
 
@@ -105,12 +106,27 @@ public class EmotionSystem : MonoBehaviour
         ChangeCloseness(+primaryEmotionalGain);
         cm.patienceManager.UpdatePatience(patienceVariation);
 
-        cm.textDisplaySystem.UpdateResponseBox(dialogue.sameResponse);
+        cm.textDisplaySystem.UpdateResponseBox(emotionDialogue.DialogueLineData.sameResponse);
     }
 
-    private void OpposingEmotionResponse(EmotionData desiredEmotionData, DialogueLineData dialogue)
+
+    private void CloseEmotionResponse(EmotionDialogueChoice emotionDialogue, EmotionData desiredEmotionData)
     {
-        Debug.Log($"Selected opposite to desired Emotion {desiredEmotionData.Type}");
+        Debug.Log($"Selected same group to desired Emotion {desiredEmotionData.EmotionType}");
+        desiredEmotionData.Intensity = ChangeEmotionIntensity(desiredEmotionData, +secondaryEmotionalGain);
+
+        var sameGroupDataToDesiredEmotion = cm.GetEmotionData(desiredEmotionData.SameGroupType);
+        sameGroupDataToDesiredEmotion.Intensity = ChangeEmotionIntensity(sameGroupDataToDesiredEmotion, +secondaryEmotionalGain + cm.emotionCombo);
+
+        ChangeCloseness(+secondaryEmotionalGain);
+
+        cm.textDisplaySystem.UpdateResponseBox(emotionDialogue.DialogueLineData.sameGroupResponse);
+
+    }
+
+    private void OpposingEmotionResponse(EmotionDialogueChoice emotionDialogue, EmotionData desiredEmotionData)
+    {
+        Debug.Log($"Selected opposite to desired Emotion {desiredEmotionData.EmotionType}");
         desiredEmotionData.Intensity = ChangeEmotionIntensity(desiredEmotionData, -primaryEmotionalGain);
 
         var oppositeDataToDesiredEmotion = cm.GetEmotionData(desiredEmotionData.OppositeType);
@@ -122,31 +138,17 @@ public class EmotionSystem : MonoBehaviour
         ChangeCloseness(-primaryEmotionalGain);
         cm.patienceManager.UpdatePatience(-patienceMaxVariation);
 
-        cm.textDisplaySystem.UpdateResponseBox(dialogue.oppositeResponse);
+        cm.textDisplaySystem.UpdateResponseBox(emotionDialogue.DialogueLineData.oppositeResponse);
     }
 
-    private void SameGroupEmotionResponse(EmotionData desiredEmotionData, DialogueLineData dialogue)
+    private void NeutralEmotionResponse(EmotionDialogueChoice emotionDialogue)
     {
-        Debug.Log($"Selected same group to desired Emotion {desiredEmotionData.Type}");
-        desiredEmotionData.Intensity = ChangeEmotionIntensity(desiredEmotionData, +secondaryEmotionalGain);
-
-        var sameGroupDataToDesiredEmotion = cm.GetEmotionData(desiredEmotionData.SameGroupType);
-        sameGroupDataToDesiredEmotion.Intensity = ChangeEmotionIntensity(sameGroupDataToDesiredEmotion, +secondaryEmotionalGain + cm.emotionCombo);
-
-        ChangeCloseness(+secondaryEmotionalGain);
-
-        cm.textDisplaySystem.UpdateResponseBox(dialogue.sameGroupResponse);
-
-    }
-
-    private void NeutralEmotionResponse(EmotionData responseEmotionData, DialogueLineData dialogue)
-    {
-        Debug.Log($"Selected the neutral Emotion {responseEmotionData.Type}");
-        responseEmotionData.Intensity = ChangeEmotionIntensity(responseEmotionData, +secondaryEmotionalGain);
+        Debug.Log($"Selected the neutral Emotion {emotionDialogue.EmotionData.EmotionType}");
+        emotionDialogue.EmotionData.Intensity = ChangeEmotionIntensity(emotionDialogue.EmotionData, +secondaryEmotionalGain);
 
         cm.patienceManager.UpdatePatience(-patienceVariation);
 
-        cm.textDisplaySystem.UpdateResponseBox(dialogue.neutralResponse);
+        cm.textDisplaySystem.UpdateResponseBox(emotionDialogue.DialogueLineData.neutralResponse);
         cm.deckManager.DrawCard();
     }
 
@@ -155,7 +157,7 @@ public class EmotionSystem : MonoBehaviour
         var finalVariation = shieldEmotionFromNegationThisTurn && variation < 0 ?  0 : variation;
 
         var newVal = ChangeValue(emotionData.Intensity, finalVariation);
-        cm.textDisplaySystem.UpdateEmotionCounter(emotionData.Type, newVal);
+        cm.textDisplaySystem.UpdateEmotionCounter(emotionData.EmotionType, newVal);
         return newVal;
     }
 
@@ -168,7 +170,7 @@ public class EmotionSystem : MonoBehaviour
     private void changeLastComboEmotion(EmotionData emotion)
     {
         cm.lastComboEmotion = emotion;
-        cm.spriteDisplaySystem.UpdateComboEmotionIcon(emotion?.Type);
+        cm.spriteDisplaySystem.UpdateComboEmotionIcon(emotion?.EmotionType);
     }
      
     private void ChangeEmotionCombo(int variation)

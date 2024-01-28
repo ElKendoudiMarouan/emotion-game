@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public static class Utils
 {
@@ -54,6 +56,46 @@ public static class Utils
             }
         }
         return null;
+    }
+
+    /**
+     * Buttons utils
+     */
+    public static Color hexToColor(string hexColor)
+    {
+        if (ColorUtility.TryParseHtmlString(hexColor, out Color color))
+        {
+            return color;
+        }
+        else
+        {
+            Debug.LogError("Invalid color format: " + hexColor);
+            return Color.white;
+        }
+    }
+
+    public static TextMeshProUGUI extractMeshTextFromButton(Button button)
+    {
+        Transform textTransform = button.transform.Find("Text"); //to change name
+        if (textTransform != null)
+        {
+            TextMeshProUGUI textComponent = textTransform.GetComponent<TextMeshProUGUI>();
+
+            if (textComponent != null)
+            {
+                return textComponent;
+            }
+            else
+            {
+                Debug.LogError("TextMeshProUGUI component not found on the button or its children.");
+                return null;
+            }
+        }
+        else
+        {
+            Debug.LogError("Text child not found on the button .");
+            return null;
+        }
     }
 
     /**

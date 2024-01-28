@@ -1,102 +1,221 @@
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 [RequireComponent(typeof(ConversationManager))]
-
 public class ButtonCreationSystem : MonoBehaviour
 {
     private ConversationManager conversationManager;
 
+    private Transform dialogButtonContainer;
     public GameObject dialogButtonPrefab;
-    public Transform dialogButtonContainer;
     private List<GameObject> dialogButtonObjects = new List<GameObject>();
     private float dialogButtonSpacing = -135f;
-    private int numberOfDialogButtons = 3;
+
+    private Transform cardButtonContainer;
+    public GameObject cardButtonPrefab;
+    public float cardButtonSpacing = 200f;
+    public Dictionary<Card, GameObject> cardButtonObjects = new Dictionary<Card, GameObject>();
+
 
     private void Start()
     {
+        if(dialogButtonContainer == null)
+        {
+            dialogButtonContainer = Utils.RecursiveFindChild(gameObject.transform, "DialogButtonContainer");
+        }
+        if (cardButtonContainer == null)
+        {
+            cardButtonContainer = Utils.RecursiveFindChild(gameObject.transform, "CardContainer");
+        }
         conversationManager = Utils.GetComponentInObject<ConversationManager>(gameObject);
-        CreateDialogButtons();
-        // Assign the initial random emotions to buttons
-        AssignRandomEmotions();
+
+        conversationManager.AssignRandomEmotions();
     }
 
-    void CreateDialogButtons()
+    public void createDialogueButtonForEmotion(EmotionDialogueChoice emotionDialogue)
     {
-        // Instantiate the button prefab
-        Vector3 position = dialogButtonContainer.transform.position;
-        for (int i = 0; i < numberOfDialogButtons; i++)
+        var buttonObject = CreateDialogButton();
+        emotionDialogue.ButtonObject = buttonObject;
+        Button buttonComponent = buttonObject.GetComponent<Button>();
+        SetDialogButtonProperties(buttonComponent, emotionDialogue);
+    }
+
+    public GameObject CreateDialogButton()
+    {
+        GameObject dialogButtonObject = Instantiate(dialogButtonPrefab, dialogButtonContainer);
+        var count = dialogButtonObjects.Count;
+        dialogButtonObject.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, count * dialogButtonSpacing);
+        dialogButtonObjects.Add(dialogButtonObject);
+        dialogButtonObject.gameObject.name = $"DialogButton{count + 1}";
+        return dialogButtonObject;
+    }
+
+    public void destroyDialogueButtons()
+    {
+        if (dialogButtonObjects.Count > 0)
         {
-            GameObject dialogButtonObject = Instantiate(dialogButtonPrefab, dialogButtonContainer);
-            dialogButtonObject.GetComponent<RectTransform>().anchoredPosition = new Vector2(0,  i * dialogButtonSpacing);
-            dialogButtonObject.gameObject.name = $"DialogButton{i+1}";
-            dialogButtonObjects.Add(dialogButtonObject);
+            for (int i = 0; i < dialogButtonObjects.Count; i++)
+            {
+                Destroy(dialogButtonObjects[i]);
+            }
+            dialogButtonObjects = new List<GameObject>();
         }
     }
 
-    public void AssignRandomEmotions()
-    {
-        conversationManager.UpdateDesiredEmotion(conversationManager.SelectRandomEmotion());
-
-        for (int i = 0; i < dialogButtonObjects.Count; i++)
-        {
-            Button buttonComponent = dialogButtonObjects[i].GetComponent<Button>();
-            SetButtonProperties(buttonComponent, conversationManager.GetEmotionData(conversationManager.shuffledEmotionTypesList[i]));
-        }
-    }
-
-    private void SetButtonProperties(Button button, EmotionData emotionData)
+    private void SetDialogButtonProperties(Button button, EmotionDialogueChoice emotionDialogue)
     {
         if (button != null)
         {
-            DialogueLineData dialogue = conversationManager.dialogueManager.GetRandomDialogueForEmotion(emotionData.Type);
-            SetButtonText(button, dialogue.playerLine);
-            SetButtonColor(button, emotionData.HexColor);
-            conversationManager.spriteDisplaySystem.FindAndUpdateButtonEmotionIcon(button.transform, emotionData.Type);
-
             button.onClick.RemoveAllListeners();
-            button.onClick.AddListener(() => HandleButtonClick(emotionData, dialogue));
-        }
-    }
-    public static void SetButtonText(Button button, string text)
-    {
-        Transform textTransform = button.transform.Find("Text"); //to change name
-        if (textTransform != null)
-        {
-            TextMeshProUGUI textComponent = textTransform.GetComponent<TextMeshProUGUI>();
+            DialogueLineData dialogue = conversationManager.dialogueManager.GetRandomDialogueForEmotion(emotionDialogue.EmotionData.EmotionType);
+            emotionDialogue.DialogueLineData = dialogue;
 
-            textComponent.text = text;
-            if (textComponent != null)
-            {
-                textComponent.text = text;
-            }
-            else
-            {
-                Debug.LogError("TextMeshProUGUI component not found on the button or its children.");
-            }
-        }
-        else
-        {
-            Debug.LogError("Text child not found on the button .");
-        }
-    }
-    public static void SetButtonColor(Button button, string hexColor)
-    {
-        if (ColorUtility.TryParseHtmlString(hexColor, out Color color))
-        {
-            ColorBlock buttonColors = button.colors;
-            buttonColors.normalColor = color;
-            button.colors = buttonColors;
-        }
-        else
-        {
-            Debug.LogError("Invalid color format: " + hexColor);
+            SetButtonText(button, dialogue.playerLine, Color.black);
+
+            SetButtonColor(button, /*emotionDialogue.EmotionData.HexColor*/ Utils.hexToColor("#AC87C5"), ColorField.Normal);
+            SetButtonColor(button, Utils.hexToColor(conversationManager.responseColorsByType[emotionDialogue.ResponseType]), ColorField.Highlighted);
+
+            var iconRenderer = conversationManager.spriteDisplaySystem.FindAndUpdateButtonEmotionIcon(button.transform, emotionDialogue.EmotionData.EmotionType);
+
+            EventTrigger trigger = button.gameObject.AddComponent<EventTrigger>();
+
+            AddEventTriggerListener(trigger, EventTriggerType.PointerEnter, () => OnDialogPointerEnter(iconRenderer));
+            AddEventTriggerListener(trigger, EventTriggerType.PointerExit, () => OnDialogPointerExit(iconRenderer));
+            AddEventTriggerListener(trigger, EventTriggerType.PointerClick, () => HandleButtonClick(emotionDialogue));
+           // button.onClick.AddListener(() => HandleButtonClick(emotionDialogue));
         }
     }
-    private void HandleButtonClick(EmotionData responseEmotionData, DialogueLineData dialogue)
+
+    public void CreateCardButton(Card card, int numberOfCardsInHands)
     {
-        conversationManager.HandlePlayerResponse(responseEmotionData, dialogue);
+        // Instantiate the button prefab
+        Vector3 position = cardButtonContainer.transform.position;
+        GameObject cardObject = Instantiate(cardButtonPrefab, cardButtonContainer);
+        cardObject.GetComponent<RectTransform>().anchoredPosition = 
+            new Vector2(position.x + (numberOfCardsInHands - 1) * cardButtonSpacing, position.y);
+
+        cardObject.gameObject.name = $"Card{card.Type}";
+        cardButtonObjects.Add(card, cardObject);
+
+        Button buttonComponent = cardObject.GetComponent<Button>();
+        buttonComponent.onClick.RemoveAllListeners();
+
+        var textComponent = SetButtonText(buttonComponent, card.Name, Color.white);
+        SetButtonColor(buttonComponent, Utils.hexToColor("#0C2D57"), ColorField.Normal);
+        SetButtonColor(buttonComponent, Utils.hexToColor("#FC6736"), ColorField.Highlighted);
+        SetButtonColor(buttonComponent, Utils.hexToColor("#FFB0B0"), ColorField.Pressed);
+        SetButtonColor(buttonComponent, Utils.hexToColor("#EFECEC"), ColorField.Disabled);
+
+        EventTrigger trigger = buttonComponent.gameObject.AddComponent<EventTrigger>();
+
+        AddEventTriggerListener(trigger, EventTriggerType.PointerEnter, () => OnCardPointerEnter(textComponent));
+        AddEventTriggerListener(trigger, EventTriggerType.PointerExit, () => OnCardPointerExit(textComponent));
+        AddEventTriggerListener(trigger, EventTriggerType.PointerClick, () => conversationManager.deckManager.PlayCard(card));
+        //buttonComponent.onClick.AddListener(() => conversationManager.deckManager.PlayCard(card));
+    }
+
+    public void DestroyCard(Card card)
+    {
+        Destroy(cardButtonObjects[card]);
+        cardButtonObjects.Remove(card);
+    }
+
+    public void RepositionCardButtons()
+    {
+        var index = 0;
+        foreach (GameObject buttonObject in cardButtonObjects.Values)
+        {
+            Vector3 position = cardButtonContainer.transform.position;
+            RectTransform cardTransform = buttonObject.GetComponent<RectTransform>();
+            cardTransform.anchoredPosition = new Vector2(position.x + cardButtonSpacing * index, position.y);
+            index++;
+        }
+    }
+
+    public void ChangeCardButtonsInteractibility(bool enabled)
+    {
+        foreach (GameObject buttonObject in cardButtonObjects.Values)
+        {
+            buttonObject.GetComponent<Button>().interactable = enabled;
+        }
+    }
+
+    private void AddEventTriggerListener(EventTrigger trigger, EventTriggerType eventType, UnityEngine.Events.UnityAction callback)
+    {
+        EventTrigger.Entry entry = new EventTrigger.Entry();
+        entry.eventID = eventType;
+        entry.callback.AddListener(_ => callback.Invoke());
+        trigger.triggers.Add(entry);
+    }
+
+    public void OnDialogPointerEnter(SpriteRenderer renderer)
+    {
+        if (renderer != null)
+        {
+            renderer.enabled = true;
+        }
+    }
+
+    public void OnDialogPointerExit(SpriteRenderer renderer)
+    {
+        if (renderer != null)
+        {
+            renderer.enabled = false;
+        }
+    }
+
+    public void OnCardPointerEnter(TextMeshProUGUI textComponent)
+    {
+        textComponent.color = Color.black;
+    }
+
+    public void OnCardPointerExit(TextMeshProUGUI textComponent)
+    {
+        textComponent.color = Color.white;
+    }
+
+    public static TextMeshProUGUI SetButtonText(Button button, string text, Color color)
+    {
+        TextMeshProUGUI textComponent = Utils.extractMeshTextFromButton(button);
+        textComponent.text = text;
+        textComponent.color = color;//Todo change this
+        return textComponent;
+    }
+
+    public static void SetButtonColor(Button button, Color color, ColorField colorField)
+    {
+        ColorBlock buttonColors = button.colors;
+
+        switch (colorField)
+        {
+            case ColorField.Normal:
+                buttonColors.normalColor = color;
+                break;
+            case ColorField.Highlighted:
+                buttonColors.highlightedColor = color;
+                break;
+            case ColorField.Pressed:
+                buttonColors.pressedColor = color;
+                break;
+            case ColorField.Selected:
+                buttonColors.selectedColor = color;
+                break;
+            case ColorField.Disabled:
+                buttonColors.disabledColor = color;
+                break;
+            default:
+                Debug.LogError("Invalid ColorField: " + colorField);
+                return;
+        }
+
+        button.colors = buttonColors;
+    }
+
+    private void HandleButtonClick(EmotionDialogueChoice emotionDialogue)
+    {
+        conversationManager.HandlePlayerResponse(emotionDialogue);
     }
 }

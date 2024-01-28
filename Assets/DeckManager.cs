@@ -7,17 +7,11 @@ public class DeckManager : MonoBehaviour
 {
     private ConversationManager cm;
 
-    private List<Card> cardsInHand = new List<Card> {};
+    public List<Card> cardsInHand = new List<Card> {};
     public List<Card> initialDeck { get; private set; }
     private List<Card> playedCards = new List<Card> { };
 
-    private Dictionary<Card, GameObject> cardObjects = new Dictionary<Card, GameObject>();
-
-    public GameObject cardButtonPrefab;
-    public Transform cardButtonContainer;
-
     [SerializeField] private int maxCardsInHand = 3;
-    private float cardsSpacing = 200f;
     [SerializeField] private int lastCardPlayedOnTurn = 0;
 
     private void Awake()
@@ -30,7 +24,6 @@ public class DeckManager : MonoBehaviour
             new Card("Increase Patience +2", CardType.IncreasePatience),
             // Add more initial cards as needed
         };
-
     }
 
     void Start()
@@ -66,25 +59,7 @@ public class DeckManager : MonoBehaviour
         Card drawnCard = initialDeck[0];
         initialDeck.RemoveAt(0);
         cardsInHand.Add(drawnCard);
-        CreateCardButton(drawnCard);
-    }
-
-    void CreateCardButton(Card card)
-    {
-        // Instantiate the button prefab
-        Vector3 position = cardButtonContainer.transform.position;
-        GameObject cardObject = Instantiate(cardButtonPrefab, cardButtonContainer);
-        cardObject.GetComponent<RectTransform>().anchoredPosition = new Vector2(position.x + (cardsInHand.Count - 1) * cardsSpacing, position.y);
-
-        cardObject.gameObject.name = $"Card{card.Type}";
-        cardObjects.Add(card, cardObject);
-       
-        Button buttonComponent = cardObject.GetComponent<Button>();
-
-        ButtonCreationSystem.SetButtonText(buttonComponent, card.Name);
-        ButtonCreationSystem.SetButtonColor(buttonComponent, "#7695bf");
-
-        buttonComponent.onClick.AddListener(() => PlayCard(card));
+        cm.buttonCreationSystem.CreateCardButton(drawnCard, cardsInHand.Count);
     }
 
     public void PlayCard(Card card)
@@ -95,23 +70,13 @@ public class DeckManager : MonoBehaviour
             cardsInHand.Remove(card);
             playedCards.Add(card);
 
-            if (cardObjects.ContainsKey(card))
+            if (cm.buttonCreationSystem.cardButtonObjects.ContainsKey(card))
             {
-                Destroy(cardObjects[card]);
+                cm.buttonCreationSystem.DestroyCard(card);
             }
-            RepositionCards();
+            cm.buttonCreationSystem.RepositionCardButtons();
+            cm.buttonCreationSystem.ChangeCardButtonsInteractibility(false);
             cm.cardEffectManager.ApplyCardEffect(card);
         }
     }
-
-    private void RepositionCards()
-    {
-        for (int i = 0; i < cardsInHand.Count; i++)
-        {
-            Vector3 position = cardButtonContainer.transform.position;
-            RectTransform cardTransform = cardObjects[cardsInHand[i]].GetComponent<RectTransform>();
-            cardTransform.anchoredPosition = new Vector2(position.x + cardsSpacing * i, position.y);
-        }
-    }
-
 }

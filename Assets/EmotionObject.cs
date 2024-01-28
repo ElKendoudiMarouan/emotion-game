@@ -9,6 +9,7 @@ public enum ConversationWinConditon
     Combo,
     Closeness
 }
+
 public enum EmotionType
 {
     Happiness,
@@ -26,9 +27,17 @@ public enum EmotionGroup
     Blue
 }
 
+public enum ResponseType
+{
+    Identical,
+    Close,
+    Neutral,
+    Opposite
+}
+
 public class EmotionData
 {
-    public EmotionType Type { get; set; }
+    public EmotionType EmotionType { get; set; }
     public EmotionType SameGroupType { get; set; }
     public EmotionType OppositeType { get; set; }
     public string HexColor { get; set; }
@@ -37,12 +46,28 @@ public class EmotionData
 
     public EmotionData(EmotionType emotion, EmotionType sameGroup, EmotionType opposite, string hexColor, EmotionGroup group, int intensity = 0)
     {
-        Type = emotion;
+        EmotionType = emotion;
         SameGroupType = sameGroup;
         OppositeType = opposite;
         HexColor = hexColor;
         Group = group;
         Intensity = intensity;
+    }
+}
+
+public class EmotionDialogueChoice
+{
+    public EmotionData EmotionData { get; set; }
+    public ResponseType ResponseType { get; set; }
+
+    public GameObject ButtonObject { get; set; }
+
+    public DialogueLineData DialogueLineData { get; set; }
+
+    public EmotionDialogueChoice(EmotionData emotionData, ResponseType responseType)
+    {
+        EmotionData = emotionData;
+        ResponseType = responseType;
     }
 }
 
@@ -91,3 +116,11 @@ public class DialogueLineData
     public string neutralResponse;
 }
 
+public enum ColorField
+{
+    Normal,
+    Highlighted,
+    Pressed,
+    Selected,
+    Disabled
+}

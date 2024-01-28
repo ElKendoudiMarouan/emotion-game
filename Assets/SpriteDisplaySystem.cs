@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 [RequireComponent(typeof(ConversationManager))]
@@ -36,7 +37,7 @@ public class SpriteDisplaySystem : MonoBehaviour
             desiredEmotionSpriteRenderer = Utils.RecursiveGetComponentByObjectName<SpriteRenderer>(desiredEmotionIconName, gameObject.transform);
         }
 
-        UpdateEmotionIcon(conversationManager.desiredEmotion, desiredIconSize, desiredEmotionSpriteRenderer);
+        UpdateEmotionIcon(emotionType, desiredIconSize, desiredEmotionSpriteRenderer);
     }
 
     public void UpdateComboEmotionIcon(EmotionType? emotionType)
@@ -67,11 +68,14 @@ public class SpriteDisplaySystem : MonoBehaviour
         PortraitContainerImage.sprite = spriteSheet[spriteIndex];
     }
 
-    public void FindAndUpdateButtonEmotionIcon(Transform buttonTranform, EmotionType emotionType)
+    public SpriteRenderer FindAndUpdateButtonEmotionIcon(Transform buttonTranform, EmotionType emotionType)
     {
-        var spriteRenderer = Utils.RecursiveGetComponentByObjectName<SpriteRenderer>(buttonEmotionIconName, buttonTranform);
+        var iconRenderer = Utils.RecursiveGetComponentByObjectName<SpriteRenderer>(buttonEmotionIconName, buttonTranform);
+        iconRenderer.enabled = false;
 
-        UpdateEmotionIcon(emotionType, buttonIconSize, spriteRenderer);
+        UpdateEmotionIcon(emotionType, buttonIconSize, iconRenderer);
+
+        return iconRenderer;
     }
 
     private void UpdateEmotionIcon(EmotionType? desiredEmotion, float iconSize, SpriteRenderer emotionSpriteRenderer)
@@ -93,6 +97,7 @@ public class SpriteDisplaySystem : MonoBehaviour
             emotionSpriteRenderer.sprite = null;
         }
     }
+
     private Sprite LoadSprite(string pathInResources)
     {
         // Load the sprite dynamically from the Resources folder

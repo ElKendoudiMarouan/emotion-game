@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -39,6 +40,9 @@ public class ConversationManager : MonoBehaviour
     public List<EmotionData> emotionDataList = new List<EmotionData>();
     public EmotionType[] shuffledEmotionTypesList;
     public EmotionType desiredEmotion;
+    public List<EmotionDialogueChoice> emotionDialogueChoices = new List<EmotionDialogueChoice>();
+    public int numberOfDialogueChoices = 3;
+    public Dictionary<ResponseType, string> responseColorsByType = new Dictionary<ResponseType, string>();
 
     [Header("Meters")]
     public int turnCounterMeter = 1;
@@ -59,21 +63,41 @@ public class ConversationManager : MonoBehaviour
         emotionDataList.Add(new EmotionData(EmotionType.Fear, EmotionType.Sadness, EmotionType.Anger, "#C400FF", EmotionGroup.Blue));
         emotionDataList.Add(new EmotionData(EmotionType.Anger, EmotionType.Disgust, EmotionType.Fear, "#FF2800", EmotionGroup.Red));
         emotionDataList.Add(new EmotionData(EmotionType.Disgust, EmotionType.Anger, EmotionType.Admiration, "#74D41F", EmotionGroup.Red));
+
+        responseColorsByType.Add(ResponseType.Identical, "#FF9800");
+        responseColorsByType.Add(ResponseType.Close, "#5F8670");
+        responseColorsByType.Add(ResponseType.Opposite, "#B80000");
+        responseColorsByType.Add(ResponseType.Neutral, "#9EB8D9");
     }
     public void Start()
     {
         emotionSystem = Utils.GetComponentInObject<EmotionSystem>(gameObject);
+        dialogueManager = Utils.GetComponentInObject<DialogueManager>(gameObject);
         buttonCreationSystem = Utils.GetComponentInObject<ButtonCreationSystem>(gameObject);
         textDisplaySystem = Utils.GetComponentInObject<TextDisplaySystem>(gameObject);
         spriteDisplaySystem = Utils.GetComponentInObject<SpriteDisplaySystem>(gameObject);
-        dialogueManager = Utils.GetComponentInObject<DialogueManager>(gameObject);
         patienceManager = Utils.GetComponentInObject<PatienceManager>(gameObject);
         deckManager = Utils.GetComponentInObject<DeckManager>(gameObject);
         cardEffectManager = Utils.GetComponentInObject<CardEffectManager>(gameObject);
 
-        winCondition = Utils.GetRandomEnumValue<ConversationWinConditon>();
+        winCondition = Utils.GetRandomEnumValue<ConversationWinConditon>();//todo change this
         CheckWinCondition();
+    }
+
+    public void AssignRandomEmotions()
+    {
         Utils.ShuffleList(shuffledEmotionTypesList);
+        UpdateDesiredEmotion(SelectRandomEmotion());
+
+        buttonCreationSystem.destroyDialogueButtons();
+        for (int i = 0; i < numberOfDialogueChoices; i++)
+        {
+            var emotionData = GetEmotionData(shuffledEmotionTypesList[i]);
+            var responseType = GetResponseType(emotionData);
+            var emotionDialogueChoice = new EmotionDialogueChoice(emotionData, responseType);
+            emotionDialogueChoices.Add(emotionDialogueChoice);
+            buttonCreationSystem.createDialogueButtonForEmotion(emotionDialogueChoice);
+        }
     }
 
     public void CheckWinCondition()
@@ -107,7 +131,6 @@ public class ConversationManager : MonoBehaviour
                     playerWin = true;
                     Debug.Log($"Win condition Achieved: Emotion Combo more or equal to {requiredEmotionCombo}");
                 }
-
                 break;
 
             case ConversationWinConditon.Group:
@@ -136,18 +159,19 @@ public class ConversationManager : MonoBehaviour
         }
         textDisplaySystem.UpdateObjectiveCounter($"Objective : {objectiveTextDetails}{(playerWin ? " : Success" : "")}");
     }
-    public void HandlePlayerResponse(EmotionData responseEmotionData, DialogueLineData dialogue)
+    public void HandlePlayerResponse(EmotionDialogueChoice emotionDialogue)
     {
-        emotionSystem.HandlePlayerResponse(responseEmotionData, dialogue);
-        spriteDisplaySystem.UpdateNPCPortrait(responseEmotionData.Type);
+        emotionSystem.HandlePlayerResponse(emotionDialogue);
+        spriteDisplaySystem.UpdateNPCPortrait(emotionDialogue.EmotionData.EmotionType);
 
         CheckWinCondition();
 
         Utils.ShuffleList(shuffledEmotionTypesList);
-        buttonCreationSystem.AssignRandomEmotions();
+        AssignRandomEmotions();
 
         AdvanceTurn();
 
+        buttonCreationSystem.ChangeCardButtonsInteractibility(true);
         cardEffectManager.CheckCardEffectsThisTurn();
         EventSystem.current.SetSelectedGameObject(null); //remove select from button
     }
@@ -163,11 +187,31 @@ public class ConversationManager : MonoBehaviour
     }
     public EmotionData GetEmotionData(EmotionType emotion) //todo : to extension class
     {
-        return emotionDataList.Find(x => x.Type == emotion)!;
+        return emotionDataList.Find(x => x.EmotionType == emotion)!;
     }
     public List<EmotionData> GetEmotionDataByGroup(EmotionGroup group)
     {
         return emotionDataList.FindAll(x => x.Group == group);
+    }
+    public ResponseType GetResponseType(EmotionData emotionData)
+    {
+        var desiredEmotionData = GetEmotionData(desiredEmotion);
+        if (emotionData.EmotionType == desiredEmotion)
+        {
+            return ResponseType.Identical;
+        }
+        else if (emotionData.EmotionType == desiredEmotionData.SameGroupType)
+        {
+            return ResponseType.Close;
+        }
+        else if (emotionData.EmotionType == desiredEmotionData.OppositeType)
+        {
+            return ResponseType.Opposite;
+        }
+        else
+        {
+            return ResponseType.Neutral;
+        }
     }
     public EmotionType SelectRandomEmotion()
     {

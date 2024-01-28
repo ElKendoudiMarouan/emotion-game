@@ -30,7 +30,7 @@ public class TextDisplaySystem : MonoBehaviour
 
         foreach (EmotionData emotionData in conversationManager.emotionDataList)
         {
-            UpdateEmotionCounter(emotionData.Type, emotionData.Intensity);
+            UpdateEmotionCounter(emotionData.EmotionType, emotionData.Intensity);
         }
     }
 
