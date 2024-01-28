@@ -90,6 +90,8 @@ public class ConversationManager : MonoBehaviour
         UpdateDesiredEmotion(SelectRandomEmotion());
 
         buttonCreationSystem.destroyDialogueButtons();
+        emotionDialogueChoices.Clear();
+
         for (int i = 0; i < numberOfDialogueChoices; i++)
         {
             var emotionData = GetEmotionData(shuffledEmotionTypesList[i]);

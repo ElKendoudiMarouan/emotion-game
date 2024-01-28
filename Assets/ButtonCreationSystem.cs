@@ -11,13 +11,13 @@ public class ButtonCreationSystem : MonoBehaviour
 
     private Transform dialogButtonContainer;
     public GameObject dialogButtonPrefab;
-    private List<GameObject> dialogButtonObjects = new List<GameObject>();
+    private Dictionary<EmotionType, GameObject> dialogButtonObjects = new Dictionary<EmotionType, GameObject>();
     private float dialogButtonSpacing = -135f;
 
     private Transform cardButtonContainer;
     public GameObject cardButtonPrefab;
-    public float cardButtonSpacing = 200f;
     public Dictionary<Card, GameObject> cardButtonObjects = new Dictionary<Card, GameObject>();
+    public float cardButtonSpacing = 200f;
 
 
     private void Start()
@@ -37,18 +37,18 @@ public class ButtonCreationSystem : MonoBehaviour
 
     public void createDialogueButtonForEmotion(EmotionDialogueChoice emotionDialogue)
     {
-        var buttonObject = CreateDialogButton();
+        var buttonObject = CreateDialogButton(emotionDialogue);
         emotionDialogue.ButtonObject = buttonObject;
         Button buttonComponent = buttonObject.GetComponent<Button>();
         SetDialogButtonProperties(buttonComponent, emotionDialogue);
     }
 
-    public GameObject CreateDialogButton()
+    public GameObject CreateDialogButton(EmotionDialogueChoice emotionDialogue)
     {
         GameObject dialogButtonObject = Instantiate(dialogButtonPrefab, dialogButtonContainer);
         var count = dialogButtonObjects.Count;
         dialogButtonObject.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, count * dialogButtonSpacing);
-        dialogButtonObjects.Add(dialogButtonObject);
+        dialogButtonObjects.Add(emotionDialogue.EmotionData.EmotionType, dialogButtonObject);
         dialogButtonObject.gameObject.name = $"DialogButton{count + 1}";
         return dialogButtonObject;
     }
@@ -57,11 +57,11 @@ public class ButtonCreationSystem : MonoBehaviour
     {
         if (dialogButtonObjects.Count > 0)
         {
-            for (int i = 0; i < dialogButtonObjects.Count; i++)
+            foreach (GameObject buttonObject in dialogButtonObjects.Values)
             {
-                Destroy(dialogButtonObjects[i]);
+                Destroy(buttonObject);
             }
-            dialogButtonObjects = new List<GameObject>();
+            dialogButtonObjects.Clear();
         }
     }
 
@@ -87,6 +87,12 @@ public class ButtonCreationSystem : MonoBehaviour
             AddEventTriggerListener(trigger, EventTriggerType.PointerClick, () => HandleButtonClick(emotionDialogue));
            // button.onClick.AddListener(() => HandleButtonClick(emotionDialogue));
         }
+    }
+
+    public void UpdateDialogButtonHoverColor(EmotionDialogueChoice emotionDialogue)
+    {
+        var button = dialogButtonObjects[emotionDialogue.EmotionData.EmotionType].GetComponent<Button>();
+        SetButtonColor(button, Utils.hexToColor(conversationManager.responseColorsByType[emotionDialogue.ResponseType]), ColorField.Highlighted);
     }
 
     public void CreateCardButton(Card card, int numberOfCardsInHands)

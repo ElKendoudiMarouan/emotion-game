@@ -43,6 +43,11 @@ public class CardEffectManager : MonoBehaviour
         EmotionData desiredEmotionData = cm.GetEmotionData(cm.desiredEmotion);
 
         cm.UpdateDesiredEmotion(desiredEmotionData.OppositeType);
+        cm.emotionDialogueChoices.ForEach(emotionDialogue =>
+        {
+            emotionDialogue.ResponseType = cm.GetResponseType(emotionDialogue.EmotionData);
+            cm.buttonCreationSystem.UpdateDialogButtonHoverColor(emotionDialogue);
+        });
     }
 
     public void ApplyComboKeeperCardEffect()
