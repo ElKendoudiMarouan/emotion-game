@@ -76,11 +76,18 @@ public class Card
     public string Name { get; set; }
     public CardType Type { get; set; }
     // Add more properties as needed
+    public string Description { get; set; }
+    public Sprite Icon { get; set; }
+    public int Duration { get; set; }
+    public int DurationLeft { get; set; }
 
-    public Card(string name, CardType type)
+    public Card(string name, CardType type, string description, int duration)
     {
         Name = name;
         Type = type;
+        Description = description;
+        Duration = duration;
+        DurationLeft = 0;
     }
 }
 

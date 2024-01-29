@@ -61,7 +61,7 @@ public static class Utils
     /**
      * Buttons utils
      */
-    public static Color hexToColor(string hexColor)
+    public static Color HexToColor(string hexColor)
     {
         if (ColorUtility.TryParseHtmlString(hexColor, out Color color))
         {
@@ -74,7 +74,7 @@ public static class Utils
         }
     }
 
-    public static TextMeshProUGUI extractMeshTextFromButton(Button button)
+    public static TextMeshProUGUI ExtractMeshTextFromButton(Button button)
     {
         Transform textTransform = button.transform.Find("Text"); //to change name
         if (textTransform != null)
@@ -96,6 +96,21 @@ public static class Utils
             Debug.LogError("Text child not found on the button .");
             return null;
         }
+    }
+
+    /**
+     * Display Utils
+     */
+    public static void UpdateSpriteAndAdaptSize(Sprite sprite, float iconSize, SpriteRenderer spriteRenderer)
+    {
+        float originalWidth = sprite.bounds.size.x;
+        float originalHeight = sprite.bounds.size.y;
+
+        float scaleFactorX = originalWidth != 0 ? iconSize / originalWidth : .1f;
+        float scaleFactorY = originalHeight != 0 ? iconSize / originalHeight : .1f;
+
+        spriteRenderer.transform.localScale = new Vector3(scaleFactorX, scaleFactorY, 1f);
+        spriteRenderer.sprite = sprite;
     }
 
     /**

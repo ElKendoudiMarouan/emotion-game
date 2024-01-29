@@ -89,7 +89,7 @@ public class ConversationManager : MonoBehaviour
         Utils.ShuffleList(shuffledEmotionTypesList);
         UpdateDesiredEmotion(SelectRandomEmotion());
 
-        buttonCreationSystem.destroyDialogueButtons();
+        buttonCreationSystem.DestroyDialogueButtons();
         emotionDialogueChoices.Clear();
 
         for (int i = 0; i < numberOfDialogueChoices; i++)
@@ -98,7 +98,7 @@ public class ConversationManager : MonoBehaviour
             var responseType = GetResponseType(emotionData);
             var emotionDialogueChoice = new EmotionDialogueChoice(emotionData, responseType);
             emotionDialogueChoices.Add(emotionDialogueChoice);
-            buttonCreationSystem.createDialogueButtonForEmotion(emotionDialogueChoice);
+            buttonCreationSystem.CreateDialogueButtonForEmotion(emotionDialogueChoice);
         }
     }
 
@@ -174,8 +174,8 @@ public class ConversationManager : MonoBehaviour
         AdvanceTurn();
 
         buttonCreationSystem.ChangeCardButtonsInteractibility(true);
-        cardEffectManager.CheckCardEffectsThisTurn();
-        EventSystem.current.SetSelectedGameObject(null); //remove select from button
+        cardEffectManager.CheckCardEffectsThisTurn(true);
+        EventSystem.current.SetSelectedGameObject(null); //for removing select from button
     }
     public void AdvanceTurn()
     {

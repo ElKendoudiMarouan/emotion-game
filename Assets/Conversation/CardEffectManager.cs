@@ -1,11 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 [RequireComponent(typeof(ConversationManager))]
 public class CardEffectManager : MonoBehaviour
 {
     private ConversationManager cm;
+
+    public Dictionary<CardType, Card>  cardEffectsActiveThisTurn = new Dictionary<CardType, Card>();
 
     void Start()
     {
@@ -30,12 +33,44 @@ public class CardEffectManager : MonoBehaviour
                 break;
                 // Handle other card types
         }
-        CheckCardEffectsThisTurn();
+        CheckCardEffectsThisTurn(false);
     }
-    public void CheckCardEffectsThisTurn()
+
+    public void CheckCardEffectsThisTurn(bool onPassTurn)
     {
-        cm.emotionSystem.protectComboThisTurn = cm.emotionSystem.comboProtectorTurns.Contains(cm.turnCounterMeter);
-        cm.emotionSystem.shieldEmotionFromNegationThisTurn = cm.emotionSystem.emotionNegationShieldTurns.Contains(cm.turnCounterMeter);
+        cm.emotionSystem.protectComboThisTurn = cm.emotionSystem.comboProtectorTurns.Contains(cm.turnCounterMeter); //TODO change this logic
+        AddOrRemoveFromActiveCardsList(CardType.ComboKeeper, cm.emotionSystem.protectComboThisTurn, onPassTurn);
+
+        cm.emotionSystem.shieldEmotionFromNegationThisTurn = cm.emotionSystem.emotionNegationShieldTurns.Contains(cm.turnCounterMeter); //TODO change this logic
+        AddOrRemoveFromActiveCardsList(CardType.NegationShield, cm.emotionSystem.shieldEmotionFromNegationThisTurn, onPassTurn);
+
+        UpdateActiveCards(cardEffectsActiveThisTurn.Values.ToList());
+    }
+
+    private void AddOrRemoveFromActiveCardsList(CardType cardType, bool isActiveThisTurn, bool onPassTurn)
+    {
+        if (isActiveThisTurn)
+        {
+            Card card = cm.deckManager.FindCard(cardType);
+            if (!cardEffectsActiveThisTurn.ContainsKey(cardType))
+            {
+                cardEffectsActiveThisTurn.Add(cardType, card);
+            }
+            if (onPassTurn)
+            {
+                card.DurationLeft--;
+            }
+        }
+        else if (cardEffectsActiveThisTurn.ContainsKey(cardType))
+        {
+            cardEffectsActiveThisTurn.Remove(cardType);
+        }
+    }
+
+    public void UpdateActiveCards(List<Card> activeCards)
+    {
+        // Update the icons in the UI
+        cm.spriteDisplaySystem.UpdateActiveCardEffectIcons(activeCards);
     }
 
     public void ApplyOppositeDesiredCardEffect()

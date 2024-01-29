@@ -8,8 +8,11 @@ public class DeckManager : MonoBehaviour
     private ConversationManager cm;
 
     public List<Card> cardsInHand = new List<Card> {};
-    public List<Card> initialDeck { get; private set; }
+    public List<Card> deck { get; private set; } = new List<Card>();
+    public List<Card> initialDeck { get; private set; } = new List<Card>();
     private List<Card> playedCards = new List<Card> { };
+
+    private List<Card> activeCards = new List<Card>();
 
     [SerializeField] private int maxCardsInHand = 3;
     [SerializeField] private int lastCardPlayedOnTurn = 0;
@@ -18,12 +21,13 @@ public class DeckManager : MonoBehaviour
     {
         initialDeck = new List<Card>
         {
-            new Card("Emotion Switch",CardType.EmotionSwitch),
-            new Card("Combo Protector 2 Turns", CardType.ComboKeeper),
-            new Card("Negation Shield 2 Turns", CardType.NegationShield),
-            new Card("Increase Patience +2", CardType.IncreasePatience),
+            new Card("Emotion Switch",CardType.EmotionSwitch, "", 0),
+            new Card("Combo Protector 2 Turns", CardType.ComboKeeper, "",2),
+            new Card("Negation Shield 2 Turns", CardType.NegationShield, "",2),
+            new Card("Increase Patience +2", CardType.IncreasePatience, "",0),
             // Add more initial cards as needed
         };
+        deck.AddRange(initialDeck);
     }
 
     void Start()
@@ -38,26 +42,26 @@ public class DeckManager : MonoBehaviour
     public void ShuffleDeck()
     {
         // Implement card shuffling logic
-        for (int i = 0; i < initialDeck.Count; i++)
+        for (int i = 0; i < deck.Count; i++)
         {
-            int randomIndex = Random.Range(i, initialDeck.Count);
-            Card temp = initialDeck[i];
-            initialDeck[i] = initialDeck[randomIndex];
-            initialDeck[randomIndex] = temp;
+            int randomIndex = Random.Range(i, deck.Count);
+            Card temp = deck[i];
+            deck[i] = deck[randomIndex];
+            deck[randomIndex] = temp;
         }
     }
 
     public void DrawCard()
     {
-        if (cardsInHand.Count >= maxCardsInHand || initialDeck.Count == 0)
+        if (cardsInHand.Count >= maxCardsInHand || deck.Count == 0)
         {
             Debug.LogWarning("Deck is empty. Unable to draw a card.");
             return;
         }
 
         // Draw a card from the deck
-        Card drawnCard = initialDeck[0];
-        initialDeck.RemoveAt(0);
+        Card drawnCard = deck[0];
+        deck.RemoveAt(0);
         cardsInHand.Add(drawnCard);
         cm.buttonCreationSystem.CreateCardButton(drawnCard, cardsInHand.Count);
     }
@@ -74,9 +78,15 @@ public class DeckManager : MonoBehaviour
             {
                 cm.buttonCreationSystem.DestroyCard(card);
             }
+            card.DurationLeft = card.Duration;
             cm.buttonCreationSystem.RepositionCardButtons();
             cm.buttonCreationSystem.ChangeCardButtonsInteractibility(false);
             cm.cardEffectManager.ApplyCardEffect(card);
         }
+    }
+
+    public Card FindCard(CardType cardType)
+    {
+        return initialDeck.Find(e => e.Type == cardType);
     }
 }

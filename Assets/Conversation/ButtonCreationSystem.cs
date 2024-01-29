@@ -35,7 +35,7 @@ public class ButtonCreationSystem : MonoBehaviour
         conversationManager.AssignRandomEmotions();
     }
 
-    public void createDialogueButtonForEmotion(EmotionDialogueChoice emotionDialogue)
+    public void CreateDialogueButtonForEmotion(EmotionDialogueChoice emotionDialogue)
     {
         var buttonObject = CreateDialogButton(emotionDialogue);
         emotionDialogue.ButtonObject = buttonObject;
@@ -43,7 +43,7 @@ public class ButtonCreationSystem : MonoBehaviour
         SetDialogButtonProperties(buttonComponent, emotionDialogue);
     }
 
-    public GameObject CreateDialogButton(EmotionDialogueChoice emotionDialogue)
+    private GameObject CreateDialogButton(EmotionDialogueChoice emotionDialogue)
     {
         GameObject dialogButtonObject = Instantiate(dialogButtonPrefab, dialogButtonContainer);
         var count = dialogButtonObjects.Count;
@@ -53,7 +53,7 @@ public class ButtonCreationSystem : MonoBehaviour
         return dialogButtonObject;
     }
 
-    public void destroyDialogueButtons()
+    public void DestroyDialogueButtons()
     {
         if (dialogButtonObjects.Count > 0)
         {
@@ -75,8 +75,8 @@ public class ButtonCreationSystem : MonoBehaviour
 
             SetButtonText(button, dialogue.playerLine, Color.black);
 
-            SetButtonColor(button, /*emotionDialogue.EmotionData.HexColor*/ Utils.hexToColor("#AC87C5"), ColorField.Normal);
-            SetButtonColor(button, Utils.hexToColor(conversationManager.responseColorsByType[emotionDialogue.ResponseType]), ColorField.Highlighted);
+            SetButtonColor(button, /*emotionDialogue.EmotionData.HexColor*/ Utils.HexToColor("#AC87C5"), ColorField.Normal);
+            SetButtonColor(button, Utils.HexToColor(conversationManager.responseColorsByType[emotionDialogue.ResponseType]), ColorField.Highlighted);
 
             var iconRenderer = conversationManager.spriteDisplaySystem.FindAndUpdateButtonEmotionIcon(button.transform, emotionDialogue.EmotionData.EmotionType);
 
@@ -92,12 +92,11 @@ public class ButtonCreationSystem : MonoBehaviour
     public void UpdateDialogButtonHoverColor(EmotionDialogueChoice emotionDialogue)
     {
         var button = dialogButtonObjects[emotionDialogue.EmotionData.EmotionType].GetComponent<Button>();
-        SetButtonColor(button, Utils.hexToColor(conversationManager.responseColorsByType[emotionDialogue.ResponseType]), ColorField.Highlighted);
+        SetButtonColor(button, Utils.HexToColor(conversationManager.responseColorsByType[emotionDialogue.ResponseType]), ColorField.Highlighted);
     }
 
     public void CreateCardButton(Card card, int numberOfCardsInHands)
     {
-        // Instantiate the button prefab
         Vector3 position = cardButtonContainer.transform.position;
         GameObject cardObject = Instantiate(cardButtonPrefab, cardButtonContainer);
         cardObject.GetComponent<RectTransform>().anchoredPosition = 
@@ -110,10 +109,10 @@ public class ButtonCreationSystem : MonoBehaviour
         buttonComponent.onClick.RemoveAllListeners();
 
         var textComponent = SetButtonText(buttonComponent, card.Name, Color.white);
-        SetButtonColor(buttonComponent, Utils.hexToColor("#0C2D57"), ColorField.Normal);
-        SetButtonColor(buttonComponent, Utils.hexToColor("#FC6736"), ColorField.Highlighted);
-        SetButtonColor(buttonComponent, Utils.hexToColor("#FFB0B0"), ColorField.Pressed);
-        SetButtonColor(buttonComponent, Utils.hexToColor("#EFECEC"), ColorField.Disabled);
+        SetButtonColor(buttonComponent, Utils.HexToColor("#0C2D57"), ColorField.Normal);
+        SetButtonColor(buttonComponent, Utils.HexToColor("#FC6736"), ColorField.Highlighted);
+        SetButtonColor(buttonComponent, Utils.HexToColor("#FFB0B0"), ColorField.Pressed);
+        SetButtonColor(buttonComponent, Utils.HexToColor("#EFECEC"), ColorField.Disabled);
 
         EventTrigger trigger = buttonComponent.gameObject.AddComponent<EventTrigger>();
 
@@ -121,6 +120,10 @@ public class ButtonCreationSystem : MonoBehaviour
         AddEventTriggerListener(trigger, EventTriggerType.PointerExit, () => OnCardPointerExit(textComponent));
         AddEventTriggerListener(trigger, EventTriggerType.PointerClick, () => conversationManager.deckManager.PlayCard(card));
         //buttonComponent.onClick.AddListener(() => conversationManager.deckManager.PlayCard(card));
+
+        CardInformationsDisplay display = cardObject.GetComponent<CardInformationsDisplay>();
+        display.SetDurationText(card.Duration);
+        conversationManager.spriteDisplaySystem.UpdateCardIcon(card, display);
     }
 
     public void DestroyCard(Card card)
@@ -185,7 +188,7 @@ public class ButtonCreationSystem : MonoBehaviour
 
     public static TextMeshProUGUI SetButtonText(Button button, string text, Color color)
     {
-        TextMeshProUGUI textComponent = Utils.extractMeshTextFromButton(button);
+        TextMeshProUGUI textComponent = Utils.ExtractMeshTextFromButton(button);
         textComponent.text = text;
         textComponent.color = color;//Todo change this
         return textComponent;
