@@ -14,7 +14,7 @@ public class PatienceManager : MonoBehaviour
     public int currentPatience = 5;
     
     private List<GameObject> iconsObjects = new List<GameObject>();
-    private float iconsSpacing = 100f;
+    private float iconsSpacing = 70f;
 
     void Start()
     {

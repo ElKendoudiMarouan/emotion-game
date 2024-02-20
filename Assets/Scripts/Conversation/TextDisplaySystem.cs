@@ -16,6 +16,10 @@ public class TextDisplaySystem : MonoBehaviour
     [SerializeField] private TextMeshProUGUI responseBox;
     private Dictionary<EmotionType, TextMeshProUGUI> emotionCounters = new Dictionary<EmotionType, TextMeshProUGUI>();
 
+    public Func<int, string> GetComboDefaultText = (int newVal) => $"Emotion Combo : +{newVal}";
+    public string saturationDefaultText =  $"Emotion saturated";
+    public string noLongerSaturationText = $"Emotion no longer saturated";
+
     void Start()
     {
         conversationManager = Utils.GetComponentInObject<ConversationManager>(gameObject);
@@ -24,7 +28,7 @@ public class TextDisplaySystem : MonoBehaviour
 
         UpdateClosenessCounter(conversationManager.currentCloseness);
 
-        UpdateEmotionComboCounter(conversationManager.emotionCombo);
+        UpdateEmotionComboCounter(GetComboDefaultText(conversationManager.emotionCombo));
 
         UpdateResponseBox("Well Hello There!"); //todo make dynamic
 
@@ -50,13 +54,13 @@ public class TextDisplaySystem : MonoBehaviour
         }
         closenessCounter.text = $"Closeness: {newVal}";
     }
-    public void UpdateEmotionComboCounter(int newVal)
+    public void UpdateEmotionComboCounter(string text)
     {
         if (comboCounter == null)
         {
             comboCounter = GetTextFieldByName("ComboCounter");
         }
-        comboCounter.text = $"Emotion Combo : +{newVal}";
+        comboCounter.text = text;
     }
     public void UpdateObjectiveCounter(string text)
     {

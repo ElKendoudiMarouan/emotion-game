@@ -12,7 +12,7 @@ public class ButtonCreationSystem : MonoBehaviour
     private Transform dialogButtonContainer;
     public GameObject dialogButtonPrefab;
     private Dictionary<EmotionType, GameObject> dialogButtonObjects = new Dictionary<EmotionType, GameObject>();
-    private float dialogButtonSpacing = -135f;
+    private float dialogButtonSpacing = -100f;
 
     private Transform cardButtonContainer;
     public GameObject cardButtonPrefab;
@@ -78,12 +78,12 @@ public class ButtonCreationSystem : MonoBehaviour
             SetButtonColor(button, /*emotionDialogue.EmotionData.HexColor*/ Utils.HexToColor("#AC87C5"), ColorField.Normal);
             SetButtonColor(button, Utils.HexToColor(conversationManager.responseColorsByType[emotionDialogue.ResponseType]), ColorField.Highlighted);
 
-            var iconRenderer = conversationManager.spriteDisplaySystem.FindAndUpdateButtonEmotionIcon(button.transform, emotionDialogue.EmotionData.EmotionType);
+            var iconImage = conversationManager.spriteDisplaySystem.FindAndUpdateButtonEmotionIcon(button.transform, emotionDialogue.EmotionData.EmotionType);
 
             EventTrigger trigger = button.gameObject.AddComponent<EventTrigger>();
 
-            AddEventTriggerListener(trigger, EventTriggerType.PointerEnter, () => OnDialogPointerEnter(iconRenderer));
-            AddEventTriggerListener(trigger, EventTriggerType.PointerExit, () => OnDialogPointerExit(iconRenderer));
+            AddEventTriggerListener(trigger, EventTriggerType.PointerEnter, () => OnDialogPointerEnter(iconImage));
+            AddEventTriggerListener(trigger, EventTriggerType.PointerExit, () => OnDialogPointerExit(iconImage));
             AddEventTriggerListener(trigger, EventTriggerType.PointerClick, () => HandleButtonClick(emotionDialogue));
            // button.onClick.AddListener(() => HandleButtonClick(emotionDialogue));
         }
@@ -160,19 +160,19 @@ public class ButtonCreationSystem : MonoBehaviour
         trigger.triggers.Add(entry);
     }
 
-    public void OnDialogPointerEnter(SpriteRenderer renderer)
+    public void OnDialogPointerEnter(Image image)
     {
-        if (renderer != null)
+        if (image != null)
         {
-            renderer.enabled = true;
+            image.enabled = true;
         }
     }
 
-    public void OnDialogPointerExit(SpriteRenderer renderer)
+    public void OnDialogPointerExit(Image image)
     {
-        if (renderer != null)
+        if (image != null)
         {
-            renderer.enabled = false;
+            image.enabled = false;
         }
     }
 

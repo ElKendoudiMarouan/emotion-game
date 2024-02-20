@@ -53,6 +53,12 @@ public class ConversationManager : MonoBehaviour
     public EmotionData lastSelectedEmotion;
     public EmotionData lastComboEmotion;
 
+    [Header("Saturation")]
+    public EmotionType lastSaturatedEmotion;
+    public bool isSaturated = false;
+
+
+
     public void Awake()
     {
         shuffledEmotionTypesList = new EmotionType[] { EmotionType.Happiness, EmotionType.Sadness, EmotionType.Admiration, EmotionType.Disgust, EmotionType.Anger, EmotionType.Fear };

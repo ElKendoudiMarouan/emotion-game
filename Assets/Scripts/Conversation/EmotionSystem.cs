@@ -27,6 +27,7 @@ public class EmotionSystem : MonoBehaviour
     public void HandlePlayerResponse(EmotionDialogueChoice emotionDialogue)
     {
         updateEmotionComboAndLatestSelectedEmotion(emotionDialogue);
+        CheckSaturation(emotionDialogue);
 
         var desiredEmotionData = cm.GetEmotionData(cm.desiredEmotion);
         switch (emotionDialogue.ResponseType)
@@ -56,39 +57,58 @@ public class EmotionSystem : MonoBehaviour
      */
     private void updateEmotionComboAndLatestSelectedEmotion(EmotionDialogueChoice emotionDialogue)
     {
-        int comboVariation = 0;
         var responseEmotionData = emotionDialogue.EmotionData;
-        if (cm.lastSelectedEmotion != null)
-        {
-            if (cm.lastComboEmotion != null && cm.lastComboEmotion.EmotionType == responseEmotionData.EmotionType)
-            {
-                if (cm.emotionCombo == 2 || cm.emotionCombo == 4)
-                {
-                    cm.patienceManager.UpdatePatience(cm.emotionCombo); //+2/4 patience two times when combo (in 3 and 5)
-                }
-                comboVariation = +comboGain;
-                changeLastComboEmotion(responseEmotionData);
-            } else if (cm.lastComboEmotion == cm.lastSelectedEmotion && cm.lastComboEmotion.SameGroupType != responseEmotionData.EmotionType && !protectComboThisTurn)
-            {
-                    comboVariation = -comboThreshold;
-                    changeLastComboEmotion(null);
 
-            } else if (cm.lastComboEmotion != cm.lastSelectedEmotion && !protectComboThisTurn)
+        if (!cm.isSaturated) { 
+            int comboVariation = 0;
+            if (cm.lastSelectedEmotion != null)
             {
-                comboVariation = -comboThreshold; //reset combo
-                if (cm.lastSelectedEmotion == responseEmotionData) //case new combo emotion
+                if (cm.lastComboEmotion != null && cm.lastComboEmotion.EmotionType == responseEmotionData.EmotionType)
                 {
-                    comboVariation = + comboGain;
-                    changeLastComboEmotion(responseEmotionData);
-                } else
+                    comboVariation = +comboGain;
+                    ChangeLastComboEmotion(responseEmotionData);
+                    if (cm.emotionCombo == 3 || cm.emotionCombo == 5)
+                    {
+                        cm.patienceManager.UpdatePatience(cm.emotionCombo); //+2/4 patience two times when combo (in 3 and 5)
+                    }
+                } else if (cm.lastComboEmotion == cm.lastSelectedEmotion && cm.lastComboEmotion.SameGroupType != responseEmotionData.EmotionType && !protectComboThisTurn)
                 {
-                    changeLastComboEmotion(null);
-                }
-            }   
-            //keep combo if all conditions fail
+                        comboVariation = -comboThreshold;
+                        ChangeLastComboEmotion(null);
+
+                } else if (cm.lastComboEmotion != cm.lastSelectedEmotion && !protectComboThisTurn)
+                {
+                    comboVariation = -comboThreshold; //reset combo
+                    if (cm.lastSelectedEmotion == responseEmotionData) //case new combo emotion
+                    {
+                        comboVariation = + comboGain;
+                        ChangeLastComboEmotion(responseEmotionData);
+                    } else
+                    {
+                        ChangeLastComboEmotion(null);
+                    }
+                }   
+                //keep combo if all conditions fail
+            }
+            ChangeEmotionCombo(comboVariation);
         }
-        ChangeEmotionCombo(comboVariation);
         cm.lastSelectedEmotion = responseEmotionData;
+    }
+
+    private void CheckSaturation(EmotionDialogueChoice emotionDialogue)
+    {
+        if (cm.emotionCombo == 2 && !cm.isSaturated)
+        {
+            cm.isSaturated = true;
+            cm.lastSaturatedEmotion = emotionDialogue.EmotionData.EmotionType;
+            cm.spriteDisplaySystem.UpdateComboEmotionIcon(emotionDialogue.EmotionData.EmotionType);
+            cm.textDisplaySystem.UpdateEmotionComboCounter(cm.textDisplaySystem.saturationDefaultText);
+        } else if (cm.isSaturated && emotionDialogue.EmotionData.EmotionType == cm.GetEmotionData(cm.lastSaturatedEmotion).OppositeType)
+        {
+            cm.isSaturated = false;
+            cm.spriteDisplaySystem.UpdateComboEmotionIcon(null);
+            cm.textDisplaySystem.UpdateEmotionComboCounter(cm.textDisplaySystem.noLongerSaturationText);
+        }
     }
 
     private void IdenticalEmotionResponse(EmotionDialogueChoice emotionDialogue, EmotionData desiredEmotionData)
@@ -167,7 +187,7 @@ public class EmotionSystem : MonoBehaviour
         cm.textDisplaySystem.UpdateClosenessCounter(cm.currentCloseness);
     }
 
-    private void changeLastComboEmotion(EmotionData emotion)
+    private void ChangeLastComboEmotion(EmotionData emotion)
     {
         cm.lastComboEmotion = emotion;
         cm.spriteDisplaySystem.UpdateComboEmotionIcon(emotion?.EmotionType);
@@ -178,7 +198,7 @@ public class EmotionSystem : MonoBehaviour
         int finalVariation = protectComboThisTurn && variation < 0  ? 0: variation; //toProtectCombo
 
         cm.emotionCombo = ChangeValue(cm.emotionCombo, finalVariation, comboThreshold);
-        cm.textDisplaySystem.UpdateEmotionComboCounter(cm.emotionCombo);
+        cm.textDisplaySystem.UpdateEmotionComboCounter(cm.textDisplaySystem.GetComboDefaultText(cm.emotionCombo));
     }
 
     private int ChangeValue(int value, int variation, int threshold = 100)

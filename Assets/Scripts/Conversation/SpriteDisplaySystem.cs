@@ -7,15 +7,13 @@ public class SpriteDisplaySystem : MonoBehaviour
 {
     private ConversationManager conversationManager;
 
-    private SpriteRenderer desiredEmotionSpriteRenderer;
-    private SpriteRenderer comboEmotionSpriteRenderer;
+    private Image desiredEmotionImage;
+    private Image comboEmotionImage;
     public Image PortraitContainerImage;
 
     public Transform cardEffectBarContainer;
     public GameObject cardEffectIconPrefab;
 
-    private float desiredIconSize = 100f;
-    private float buttonIconSize = 100f;
     [SerializeField] private string desiredEmotionIconName = "DesiredEmotionIcon";
     [SerializeField] private string comboEmotionIconName = "ComboEmotionIcon";
     [SerializeField] private string buttonEmotionIconName = "ButtonEmotionIcon";
@@ -44,22 +42,22 @@ public class SpriteDisplaySystem : MonoBehaviour
     public void UpdateDesiredEmotionIcon(EmotionType emotionType)
     {
 
-        if (desiredEmotionSpriteRenderer == null)
+        if (desiredEmotionImage == null)
         {
-            desiredEmotionSpriteRenderer = Utils.RecursiveGetComponentByObjectName<SpriteRenderer>(desiredEmotionIconName, gameObject.transform);
+            desiredEmotionImage = Utils.RecursiveGetComponentByObjectName<Image>(desiredEmotionIconName, gameObject.transform);
         }
 
-        UpdateEmotionIcon(emotionType, desiredIconSize, desiredEmotionSpriteRenderer);
+        UpdateEmotionIcon(emotionType, desiredEmotionImage);
     }
 
     public void UpdateComboEmotionIcon(EmotionType? emotionType)
     {
-        if (comboEmotionSpriteRenderer == null)
+        if (comboEmotionImage == null)
         {
-            comboEmotionSpriteRenderer = Utils.RecursiveGetComponentByObjectName<SpriteRenderer>(comboEmotionIconName, gameObject.transform);
+            comboEmotionImage = Utils.RecursiveGetComponentByObjectName<Image>(comboEmotionIconName, gameObject.transform);
         }
 
-        UpdateEmotionIcon(emotionType, buttonIconSize, comboEmotionSpriteRenderer);
+        UpdateEmotionIcon(emotionType, comboEmotionImage);
     }
 
     public void UpdateNPCPortrait(EmotionType? emotion)
@@ -80,26 +78,26 @@ public class SpriteDisplaySystem : MonoBehaviour
         PortraitContainerImage.sprite = spriteSheet[spriteIndex];
     }
 
-    public SpriteRenderer FindAndUpdateButtonEmotionIcon(Transform buttonTranform, EmotionType emotionType)
+    public Image FindAndUpdateButtonEmotionIcon(Transform buttonTranform, EmotionType emotionType)
     {
-        var iconRenderer = Utils.RecursiveGetComponentByObjectName<SpriteRenderer>(buttonEmotionIconName, buttonTranform);
+        var iconRenderer = Utils.RecursiveGetComponentByObjectName<Image>(buttonEmotionIconName, buttonTranform);
         iconRenderer.enabled = false;
 
-        UpdateEmotionIcon(emotionType, buttonIconSize, iconRenderer);
+        UpdateEmotionIcon(emotionType, iconRenderer);
 
         return iconRenderer;
     }
 
-    private void UpdateEmotionIcon(EmotionType? desiredEmotion, float iconSize, SpriteRenderer emotionSpriteRenderer)
+    private void UpdateEmotionIcon(EmotionType? desiredEmotion, Image emotionSpriteImage)
     {
         if (desiredEmotion != null)
         {
             Sprite emotionSprite = LoadSprite($"{emotionSpritesFolder}/{desiredEmotion}Icon");
 
-            Utils.UpdateSpriteAndAdaptSize(emotionSprite, iconSize, emotionSpriteRenderer);
+            emotionSpriteImage.sprite = emotionSprite;
         } else
         {
-            emotionSpriteRenderer.sprite = null;
+            emotionSpriteImage.sprite = null;
         }
     }
 
