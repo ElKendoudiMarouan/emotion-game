@@ -1,9 +1,10 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
-public class PauseMenu  : MonoBehaviour
+public class MenuManager  : MonoBehaviour
 {
     public static bool gameIsPaused;
     public GameObject pauseMenuUI;
+    public GameObject conversationMenuUI;
 
     void Update()
     {
@@ -17,11 +18,24 @@ public class PauseMenu  : MonoBehaviour
                 Pause();
             }
         }
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            if (gameIsPaused)
+            {
+                Resume();
+            }
+            else
+            {
+                ShowConversationMenu();
+            }
+        }
     }
 
     public void Resume()
     {
         pauseMenuUI.SetActive(false);
+        conversationMenuUI.SetActive(false);
+
         Time.timeScale = 1.0f;
         gameIsPaused = false;
 
@@ -29,6 +43,13 @@ public class PauseMenu  : MonoBehaviour
     void Pause()
     {
         pauseMenuUI.SetActive(true);   
+        Time.timeScale = 0f;
+        gameIsPaused = true;
+    }
+
+    void ShowConversationMenu()
+    {
+        conversationMenuUI.SetActive(true);
         Time.timeScale = 0f;
         gameIsPaused = true;
     }
