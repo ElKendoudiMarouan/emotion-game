@@ -27,12 +27,14 @@ public class PatienceManager : MonoBehaviour
     {
         for (int i = 0; i < maxPatience; i++)
         {
-            GameObject patienceBar = GameObject.Find("PatienceBar");
+            Transform patienceBar = Utils.RecursiveFindChild(gameObject.transform, "PatienceBar");
+
             if (patienceBar == null)
             {
                 Debug.LogError($"Cannot find patience bar with name {patienceBar}");
             }
-            Vector3 position = patienceBar.transform.position;
+
+            Vector3 position = patienceBar.position;
 
             GameObject patience = Instantiate(patiencePrefab, patienceBar.transform);
             patience.GetComponent<RectTransform>().anchoredPosition = new Vector2(position.x + i * iconsSpacing, position.y);
