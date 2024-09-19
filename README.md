@@ -1,4 +1,4 @@
-<h1 align="center">Football Game</h1>
+<h1 align="center">Emotion Game</h1>
 
 <br />
 
